@@ -1,0 +1,78 @@
+from flask import request, jsonify
+from flask_cors import CORS
+from .favorites import FavoritesManager
+
+import os
+from pathlib import Path
+
+from __main__ import app
+
+HOMEDIR = str(Path.home())
+
+def listdir(path, hidden=False):
+    for f in os.listdir(path):
+        if hidden:
+            yield f
+        elif not f.startswith('.'):
+            yield f
+
+def getDirData(curPath, hidden=False):
+    data = {
+        'path': curPath,
+        'entries': [],
+    }
+
+    for filename in listdir(curPath, hidden):
+        filepath = os.path.join(curPath, filename)
+        data['entries'].append({
+            'name': filename,
+            'path': filepath,
+            'dir': os.path.isdir(filepath)
+        })
+
+    # Directories first, then files. Then sort by name, ignoring case.
+    data['entries'].sort(key=lambda x: (1-x['dir'], x['name'].lower()))
+    return jsonify(data)
+
+@app.route("/get-path")
+def route_get_subfolder():
+    path = request.args.get('path', HOMEDIR)
+    hidden = request.args.get('hidden', 'false') == 'true'
+
+    curPath = os.path.abspath(path)
+    return getDirData(curPath, hidden)
+
+@app.route("/get-parent")
+def route_get_parent():
+    path = request.args.get('path', "/")
+    hidden = request.args.get('hidden', 'false') == 'true'
+
+    curPath = os.path.dirname(path)
+    return getDirData(curPath, hidden)
+    
+FAVORITES = FavoritesManager()
+
+@app.route("/favorites")
+def route_get_favorites():
+    return jsonify(FAVORITES.getFavorites())
+
+@app.route("/favorites", methods=["POST"])
+def route_add_favorite():
+    path = request.args.get('path', None)
+    if path is not None:
+        FAVORITES.addFavorite(path)
+    return jsonify(FAVORITES.getFavorites())
+
+@app.route("/favorites", methods=["DELETE"])
+def route_del_favorite():
+    path = request.args.get('path', None)
+    if path is not None:
+        FAVORITES.removeFavorite(path)
+    return jsonify(FAVORITES.getFavorites())
+
+
+
+
+
+if __name__ == '__main__':
+    app.run()
