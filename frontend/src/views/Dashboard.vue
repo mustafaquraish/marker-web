@@ -158,7 +158,7 @@ export default {
     },
     downloadClick() {
       let usernames = this.getSelectedUsernames()
-      console.log(usernames);
+      // console.log(usernames);
       this.runJob(
         ()=>API.downloadAll(usernames)
       );
@@ -190,13 +190,13 @@ export default {
     stopJobClick() {
       API.stopJob()
         .then((res) => {
-          console.log(res)
+          // No need to handle response here
         }).catch((err) => {
           console.log("OH NO COULDN'T KILL")
         })
     },
     async showMessage(message) {
-      console.log(message);
+      // console.log(message);
       let timeout = 0
       if (this.snackbar) {
         this.snackbar = false;
@@ -209,7 +209,7 @@ export default {
     },
     async runJob(func) {
       try {
-        console.log("Running job...")
+        // console.log("Running job...")
         await func();
         this.$refs.tracker.refreshProgress();
       } catch (err) {

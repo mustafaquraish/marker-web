@@ -109,7 +109,6 @@ export default {
   }),
   beforeMount () {
     API.getHome().then((res) => {
-      console.log(res)
       this.directory = res.path
       this.values = res.entries;
     })
@@ -129,25 +128,22 @@ export default {
   },
   watch: {
     hidden() {
-      this.doRequestPath(()=>API.getSubdir(this.directory, null, this.hidden))
+      this.doRequestPath(()=>API.getPath(this.directory, this.hidden))
     },
   },
   methods: {
     doRequestPath(func) {
       func().then((res) => {
-        console.log(res)
         this.directory = res.path
         this.values = res.entries;
       })
     },
     doRequestFav(func) {
       func().then((res) => {
-        console.log(res)
         this.favorites = res
       })
     },
     clickedItem(item) {
-      console.log("got smth")
       if (item.dir) {
         this.doRequestPath(()=>API.getPath(item.path, this.hidden))
       }

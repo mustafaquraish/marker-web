@@ -29,42 +29,42 @@ async function doRequest(func, fakefunc) {
 
 export default {
     async getPath(path, hidden=false) {
-        console.log("Asking for subdir", path)
+        // console.log("Asking for subdir", path)
         return doRequest(
-            () => axios.get(HOST + '/get-path', { params: { path } }),  /* Real request */
+            () => axios.get(HOST + '/get-path', { params: { path, hidden } }),  /* Real request */
             () => FakeAPI.getPath(path, hidden),       /* Fake request */
         )
     },
     async getParent(path, hidden=false) {
-        console.log("Asking for parent", path, hidden)
+        // console.log("Asking for parent", path, hidden)
         return doRequest(
             () => axios.get(HOST + '/get-parent', { params : { path, hidden } }),  /* Real request */
             () => FakeAPI.getParent(path, hidden),       /* Fake request */
         )
     },
     async getHome(hidden=false) {
-        console.log("Asking for home", hidden)
+        // console.log("Asking for home", hidden)
         return doRequest(
             () => axios.get(HOST + '/get-path', { params : { hidden } }),  /* Real request */
             () => FakeAPI.getHome(hidden),       /* Fake request */
         )
     },
     async getFavorites() {
-        console.log("Asking for favs")
+        // console.log("Asking for favs")
         return doRequest(
             () => axios.get(HOST + '/favorites'),  /* Real request */
             () => FakeAPI.getFavorites(),       /* Fake request */
         )
     },
     async addFavorite(path) {
-        console.log("adding favs", path)
+        // console.log("adding favs", path)
         return doRequest(
             () => axios.post(HOST + '/favorites', null, { params: { path } }),  /* Real request */
             () => FakeAPI.addFavorite(path),       /* Fake request */
         )
     },
     async delFavorite(path) {
-        console.log("del favs")
+        // console.log("del favs")
         return doRequest(
             () => axios.delete(HOST + '/favorites', { params: { path } }),  /* Real request */
             () => FakeAPI.delFavorite(path),       /* Fake request */

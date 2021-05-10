@@ -74,7 +74,7 @@ export default {
         if (JOB.done == false) {
             throw Error("Another job is running");
         }
-        console.log("Resetting the job...")
+        // console.log("Resetting the job...")
         JOB.name = name
         JOB.progress = 0;
         JOB.killed = false;
@@ -83,7 +83,7 @@ export default {
         return { "started": "ok" };
     },
     async getJob() {
-        console.log("Asking for progress:")
+        // console.log("Asking for progress:")
         let done = JOB.progress >= 100 || JOB.killed;
         if (!done) {
             JOB.progress += Math.floor(Math.random() * 20);

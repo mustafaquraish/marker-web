@@ -26,7 +26,6 @@ export default {
     },
     methods: {
         clickedItem(item) {
-          console.log("Clicked...", item)
           this.$emit('folderClicked', item)
         }
     }
