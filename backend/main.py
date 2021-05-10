@@ -42,10 +42,13 @@ if __name__ == '__main__':
     def route_default():
         return send_file(index_html_path)
 
+    # Try to run setup the marker in the current directory, but this
+    # might fail if command line args are not specified. Don't do
+    # anything here, user will be prompted to pick dir in UI.
     setupMarker()
 
     if "noweb" in sys.argv:
         app.run()
     else:
-        window = webview.create_window('Marker', app)
+        window = webview.create_window('Marker', app, width=1280, height=800, easy_drag=True)
         webview.start()

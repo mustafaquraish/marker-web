@@ -61,4 +61,20 @@ const router = new VueRouter({
   routes
 })
 
+import store from '@/store/index.js'
+import markerAPI from '@/lib/marker/API'
+
+router.beforeEach(async (to, from, next) => {
+  if (to.path == "/explorer") next()
+
+  if (!store.state.markerState.loaded) {
+    await store.dispatch('fetchMarkerState',
+      () => markerAPI.getMarkerState()
+    );
+  } 
+  
+  if (!store.state.markerState.valid) next('/explorer')
+  else next();
+})
+
 export default router

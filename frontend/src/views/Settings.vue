@@ -16,7 +16,7 @@
       <v-text-field outlined v-model="config.course"     label="Course ID"        v-if="config.lms == 'canvas'"/>
       <v-text-field outlined v-model="config.assignment" label="Assignment ID"/>
       <v-text-field outlined v-model="config.default_criteria" label="Default Marking Criteria" v-if="config.lms == 'markus'"/>
-      <v-textarea outlined v-model="fileNamesString" color="teal" rows="2">
+      <v-textarea outlined v-model="fileNamesString" color="teal" auto-grow>
         <template v-slot:label>Files to download</template>
       </v-textarea>
     </v-form>
@@ -28,13 +28,13 @@
     <div class="display-1 pt-5"> Compilation </div><br>
     <v-form class="py-3">
       <v-text-field outlined v-model="config.src_dir"  label="Source directory"/>
-      <v-textarea outlined v-model="importsString" color="teal" rows="3">
+      <v-textarea outlined v-model="importsString" color="teal" rows="2" auto-grow>
         <template v-slot:label>Files/Dirs to import</template>
       </v-textarea>
-      <v-textarea outlined v-model="config.compile" color="teal" rows="4">
+      <v-textarea outlined v-model="config.compile" color="teal" rows="2" auto-grow>
         <template v-slot:label>Compile Command</template>
       </v-textarea>
-      <v-textarea outlined v-model="config.compile_check" color="teal" rows="2">
+      <v-textarea outlined v-model="config.compile_check" color="teal" rows="2" auto-grow>
         <template v-slot:label>Compile Check Command</template>
       </v-textarea>
       <v-text-field outlined v-model="config.compile_log"  label="Compilation log file"/>
@@ -49,7 +49,7 @@
       <v-text-field outlined v-model="config.marksheet"   label="Marksheet"/>
       <v-text-field outlined v-model="config.report"   label="Report file"/>
       <v-select     outlined v-model="config.include_compile_log" label="Include compile log?" :items="[true, false]"/>
-      <v-textarea outlined v-model="config.report_header" color="teal" rows="4">
+      <v-textarea outlined v-model="config.report_header" color="teal" rows="2" auto-grow>
         <template v-slot:label>Report Header</template>
       </v-textarea>
     </v-form>

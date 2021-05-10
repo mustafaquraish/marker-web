@@ -29,6 +29,14 @@ function getFromParts(parts, hidden) {
             });
         }
     }
+    let pparts = parts.slice(0, parts.length-1);
+    let ppath = pparts.length == 1 ? "/" : pparts.join("/")
+    data.entries.push({
+        'name': '..',
+        'path': ppath,
+        'dir': true
+    })
+
     data.entries.sort((a, b)=> {
         if (a.dir == b.dir) {
             return (a.name.toLowerCase() < b.name.toLowerCase()) ? -1 : 1;

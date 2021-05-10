@@ -57,8 +57,8 @@
             color="#8b9ef0" 
             width="200"
             class="ma-2"
-            v-if="result && result.folder && !mobile"
-            :href="'vscode://file/'+result.folder"
+            v-if="result && result.path && !mobile"
+            :href="'vscode://file/'+result.path"
             target="_blank"
           > 
             Open in VSCode 
@@ -86,7 +86,11 @@
       Submission is not marked yet.
     </div>
 
-    <div v-if="result && result.marked && !loading">
+    <div v-if="result && result.marked && !loading && !result.json">
+      <pre>{{result.text}}</pre>
+    </div>
+
+    <div v-if="result && result.marked && !loading && result.json">
       <body class="body-1 pa-4">
         Total marks: {{ result.total }}
       </body>
@@ -183,33 +187,43 @@
       }
     },
     methods: {
+      async handleResult(callback) {
+        this.loading = true;
+        let res = await callback()        
+        try {
+          this.result = JSON.parse(res.data);
+          this.result.json = true;
+        } catch (err) {
+          this.result = { 'text': res.data };
+          this.result.json = false
+        }
+        this.result.path = res.path;
+        this.result.marked = res.marked;
+        this.result.message = res.message;
+        this.loading = false;
+      },
       refreshResults() {
         if (!this.username) return;
         this.result = null;
-        this.loading = true;
-        console.log()
-        API.getStudentResults(this.username).then((res) => {
-          this.result = res;
-          this.loading = false;
-        })
+        this.handleResult(
+          ()=>API.getStudentResults(this.username)
+        );
       },
-      runTests(recompile) {
-        this.loading = true;
-        API.runTestsSingle(this.username, recompile)
-           .then((res) => {
-             this.result = res;
-             this.loading = false;
-             this.snackbarText = "Finished running tests!"
-             this.snackbar = true;
-           })
+      async runTests(recompile) {
+        await this.handleResult(
+          ()=>API.runTestsSingle(this.username, recompile)
+        )
+        this.snackbarText = "Finished running tests!"
+        this.snackbar = true;
+        this.$emit('updateMarks', this.username, this.result.marks);
       },
       reDownload() {
         this.downloading = true
         API.downloadSingle(this.username, false)
            .then((res) => {
-            this.downloading = false
-             this.snackbarText = "Finished downloading files!"
-             this.snackbar = true;
+              this.downloading = false
+              this.snackbarText = "Finished downloading files!"
+              this.snackbar = true;
            })
       }
     },

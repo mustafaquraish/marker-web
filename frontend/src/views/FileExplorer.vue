@@ -2,14 +2,20 @@
   <div class="root ma-0 pa-0 mr-0">
     
     <div class="subcontainer">
-      <v-subheader class="title">
-        File Explorer
+      <v-subheader class="title mb-2">
+        Select assignment directory
+        <v-tooltip top>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs" v-on="on" class="mx-5">mdi-information-outline </v-icon>
+          </template>
+          <span>Should contain a valid config file</span>
+        </v-tooltip>
       </v-subheader>
       <div style="display: flex; flex-direction: row;">
         <span class="px-4">Current directory:</span><code>{{shortDirName}}</code>
       </div>
 
-      <div class="dirControls py-2 px-3">
+      <div class="dirControls my-2 mx-3">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon @click="getHome" v-bind="attrs" v-on="on"> mdi-folder-home </v-icon>
@@ -45,52 +51,42 @@
     <FavoritesList :values="favorites" @folderClicked="selectedFav" class="split right"/>
     </div>
     
-    <v-dialog width="500" v-model="dialog">
-      <template v-slot:activator="{ on, attrs }">
-        
-        <div
-          style="display: flex; justify-content: center;"
-        >
-          <v-btn v-bind="attrs" v-on="on"
-            class="mt-5"
-          >
-            Select this directory...
-          </v-btn>
-        </div>
-      </template>
 
+    <div style="width: 100%; display: flex; justify-content: center;">
+      <v-btn @click="selectClick" class="mt-3" width="250px" >
+        <v-progress-circular v-if="selectLoading" size="20" indeterminate color="green"/>
+        <span v-if="!selectLoading">Select this directory...</span>
+      </v-btn>
+    </div>
+
+    <v-dialog width="500" v-model="dialog">
       <v-card>
         <v-card-title class="headline grey lighten-2">
-          You have selected:
+          Invalid Directory
         </v-card-title>
 
-        <v-card-text>
-          {{directory}}
-          <br>
-          <br>
-          (Currently this does nothing, TODO...)
+        <v-card-text class="mt-5">
+          The directory you selected (<code>{{directory}}</code>) does not contain a configuration file. Please select a valid directory to see results.
         </v-card-text>
 
         <v-divider></v-divider>
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="dialog = false"
-          >
-            Confirm?
+          <v-btn @click="dialog = !dialog" dense id="closeDialog">
+            <span>Close</span>
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
     </div>
   </div>
 </template>
 
 <script>
-import API from '@/lib/explorer/API'
+import explorerAPI from '@/lib/explorer/API'
+import markerAPI from '@/lib/marker/API'
 import FileList from '@/components/Explorer/FileList'
 import FavoritesList from '@/components/Explorer/FavoritesList'
 
@@ -104,15 +100,17 @@ export default {
     directory: "",
     hidden: false,
     dialog: false,
+    selectLoading: false,
     favorites: [],
     fav: false,
   }),
   beforeMount () {
-    API.getHome().then((res) => {
+    let path = this.$store.state.markerState.path;
+    explorerAPI.getPath(path).then((res) => {
       this.directory = res.path
       this.values = res.entries;
     })
-    this.doRequestFav(()=>API.getFavorites())
+    this.doRequestFav(()=>explorerAPI.getFavorites())
   },
   computed: {
     shortDirName () {
@@ -123,12 +121,14 @@ export default {
       return this.directory
     },
     isFavorite() {
-      return this.favorites.reduce((result, item) => (result || item.path == this.directory), false);
+      return this.favorites.reduce((res, item) => (
+        (res || item.path == this.directory)
+      ), false);
     }
   },
   watch: {
     hidden() {
-      this.doRequestPath(()=>API.getPath(this.directory, this.hidden))
+      this.doRequestPath(()=>explorerAPI.getPath(this.directory, this.hidden))
     },
   },
   methods: {
@@ -145,25 +145,42 @@ export default {
     },
     clickedItem(item) {
       if (item.dir) {
-        this.doRequestPath(()=>API.getPath(item.path, this.hidden))
+        this.doRequestPath(()=>explorerAPI.getPath(item.path, this.hidden))
       }
     }, 
     getParent() {
-      this.doRequestPath(()=>API.getParent(this.directory, this.hidden))
+      this.doRequestPath(()=>explorerAPI.getParent(this.directory, this.hidden))
     },
     getHome() {
-      this.doRequestPath(()=>API.getHome(this.hidden))
+      this.doRequestPath(()=>explorerAPI.getHome(this.hidden))
     },
     clickFav() {
       if (this.isFavorite) {
-        this.doRequestFav(()=>API.delFavorite(this.directory))
+        this.doRequestFav(()=>explorerAPI.delFavorite(this.directory))
       } else {
-        this.doRequestFav(()=>API.addFavorite(this.directory))
+        this.doRequestFav(()=>explorerAPI.addFavorite(this.directory))
       }
     },
     selectedFav(item) {
-      this.doRequestPath(()=>API.getPath(item.path, this.hidden))
+      this.doRequestPath(()=>explorerAPI.getPath(item.path, this.hidden))
+    },
+    async selectClick() {
+      this.selectLoading = true;
+      let success = false;
+      try {
+        await markerAPI.setMarkerPath(this.directory);
+        success = true;
+      } catch (err) {
+        this.dialog = true;
+      } finally {
+        await this.$store.dispatch('fetchMarkerState',
+          () => markerAPI.getMarkerState()
+        );
+        this.selectLoading = false;
+      }
+      if (success) this.$router.push("/");
     }
+      
   }
 }
 </script>
@@ -182,11 +199,11 @@ export default {
 
 .subcontainer {
   position: absolute;
-  width: 80%;
-  height: 80%;
+  width: 90%;
+  height: 90%;
   display: flex;
   flex-direction: column;
-  padding: 2em;
+  padding: 1em;
   background-color: #e0e0e0;
   border-radius: 10px;
 }
@@ -199,7 +216,7 @@ export default {
   flex-direction: row;
 
   .split {
-    margin: 0px 12px;
+    margin: 0px 5px;
   }
 }
 
@@ -232,6 +249,11 @@ export default {
   .v-input--checkbox {
     height: 10px;
   }
+}
+
+#closeDialog {
+  background-color: #e0e0e0;
+  width: 100px;
 }
 
 </style>

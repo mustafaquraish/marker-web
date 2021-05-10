@@ -26,6 +26,23 @@ async function doRequest(func, fakefunc) {
 
 export default {
     ////////////////////////////////////////////////////////////////////////////////////
+    
+    async getMarkerState() {
+        return doRequest(
+            () => axios.get(HOST + "/state"),     /* Real request */
+            () => FakeAPI.getMarkerState(),       /* Fake request */
+        )
+    },
+
+    async setMarkerPath(path) {
+        return doRequest(
+            () => axios.post(HOST + "/state", null, { params: { path } }),  /* Real request */
+            () => FakeAPI.setMarkerPath(path),                              /* Fake request */
+        )
+    },
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////
 
     async getAllResults() {
         // console.log("Asking for all results...")

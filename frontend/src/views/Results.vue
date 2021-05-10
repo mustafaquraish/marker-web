@@ -16,7 +16,10 @@
     </pane>
 
     <pane min-size="30%" v-if="!mobile">
-      <UserResult :username="selectedUsername"></UserResult>
+      <UserResult 
+        :username="selectedUsername"
+        @updateMarks="updateMarks"
+      ></UserResult>
     </pane>
   </splitpanes>
 </template>
@@ -63,6 +66,13 @@ export default {
       } else {
         this.selectedUsername = username;
       }
+    },
+    updateMarks(student, marks) {
+      this.items.forEach((item) => {
+        if (item.username == student) {
+          item.marks = marks;
+        }
+      })
     }
   },
   computed: {

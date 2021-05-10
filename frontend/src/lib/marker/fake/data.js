@@ -75,9 +75,7 @@ export const testresult = {
     ],
     "compile_log": "closest.c:143:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]\n}\n^\nclosest.c:292:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]\n}\n^\nclosest.c:342:1: warning: non-void function does not return a value [-Wreturn-type]\n}\n^\nclosest.c:393:1: warning: non-void function does not return a value [-Wreturn-type]\n}\n^\n4 warnings generated.\n",
     "compiled": true,
-    "folder": "/Users/mustafa/Desktop",
     "total": 3,
-    "marked" : true,
 }
 
 export const config = {

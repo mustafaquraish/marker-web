@@ -4,10 +4,10 @@ import rich
 from rich.console import Console as RichConsole
 from rich.progress import BarColumn, Progress, TextColumn, TimeRemainingColumn
 
-from marker.utils.console import Console
+from marker.utils.console import ConsoleABC
 from .jobs import JobTracker
 
-class WebConsole(Console, RichConsole):
+class WebConsole(ConsoleABC, RichConsole):
     def __init__(self):
         super().__init__()
     

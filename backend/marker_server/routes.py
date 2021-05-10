@@ -14,6 +14,8 @@ import threading
 import os
 import time
 
+from pathlib import Path
+
 ############################# Init Flask ######################################
 
 markerBP = Blueprint('marker', __name__)
@@ -21,7 +23,32 @@ markerBP = Blueprint('marker', __name__)
 ############################# Global Variables ################################
 
 MARKER = None
-ARGS = []
+ARGS = {}
+
+###############################################################################
+
+@markerBP.route('/state')
+def route_get_state():
+    isValid = (MARKER is not None)
+    if 'assgn_dir' in ARGS:
+        path = ARGS.get('assgn_dir')
+    else:
+        path = os.path.abspath(Path.home())
+    config = MARKER.cfg if isValid else None
+    return { 'valid': isValid, 'path': path, 'config': config  }
+
+@markerBP.route('/state', methods=["POST"])
+def route_set_path():
+    path = request.args.get('path', None)
+    if path is None:
+        return make_response("Path not included", 400)
+
+    args = parseArgs(assgn_dir=path)
+    if updateMarker(args):
+        return make_response("Success", 200)
+    else:
+        return make_response("Path isn't valid", 400)
+
 
 ###############################################################################
 
@@ -73,23 +100,25 @@ def route_single_result(student_id):
     student_dir = MARKER.getStudentDir(student_id)
     if student_dir is None:
         student_result = { 
-            'marked': False, 
-            "message": "Student directory doesn't exist. You may need to delete the marksheet and re-download submissions." 
+            "marked": False, 
+            "message": "Student directory doesn't exist. You may need to delete the marksheet and re-download submissions." ,
         }
         return student_result
 
     json_path = f'{student_dir}/{MARKER.cfg["report"]}'
     if not os.path.isfile(json_path):
         student_result = { 
-            'marked': False, 
-            "message": "Submission is not marked yet."
+            "marked": False, 
+            "message": "Submission is not marked yet.",
+            "path": os.path.abspath(student_dir),
         }
         return student_result
         
-    student_result = json.load(open(json_path))
+    student_result = {}
     # Add the directory onto the result so we can open up vscode :^)
-    student_result["folder"] = os.path.abspath(student_dir)
+    student_result["path"] = os.path.abspath(student_dir)
     student_result["marked"] = True
+    student_result["data"] = open(json_path).read()
     return student_result
 
 @markerBP.route('/stats')
@@ -108,7 +137,7 @@ def route_download_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.download(students, False),
-        "Downloading Submissions"
+        "Downloading Submissions", "download"
     )
     return make_response("OK", 200)
 
@@ -129,7 +158,7 @@ def route_prepare_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.prepare(students),
-        "Preparing Submissions"
+        "Preparing Submissions", "prepare"
     )
 
 @markerBP.route('/prepare/<string:student_id>', methods=['POST'])
@@ -149,7 +178,7 @@ def route_run_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.run(students, recompile, run_all, True),
-        "Marking Submissions"
+        "Marking Submissions", "run"
     )
 
 @markerBP.route('/run/<string:student_id>', methods=['POST'])
@@ -168,7 +197,7 @@ def route_upload_marks_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.upload_marks(students),
-        "Uploading Marks"
+        "Uploading Marks", "upload-marks"
     )
 
 @markerBP.route('/upload-marks/<string:student_id>', methods=['POST'])
@@ -186,7 +215,7 @@ def route_upload_reports_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.upload_reports(students),
-        "Uploading reports"
+        "Uploading reports", "upload-reports"
     )
 
 @markerBP.route('/upload-reports/<string:student_id>', methods=['POST'])
@@ -204,7 +233,7 @@ def route_delete_reports_all():
     print("Got students:", students)
     return JobTracker.startInThread(lambda:
         MARKER.delete_reports(students),
-        "Deleting reports"
+        "Deleting reports", "delete-reports"
     )
 
 @markerBP.route('/delete-reports/<string:student_id>', methods=['POST'])
@@ -233,8 +262,14 @@ def updateMarker(args):
     global ARGS
     global MARKER
 
-    ARGS = args
-    MARKER = Marker(args, WebConsole())
+    try:
+        ARGS = args
+        print("ARGS is now", ARGS)
+        MARKER = Marker(args, WebConsole())
+        return True
+    except BaseException as exc:
+        MARKER = None
+        return False
 
 def setupMarker():
     args = parseArgs()

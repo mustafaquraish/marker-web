@@ -10,6 +10,7 @@ class JobTracker:
     errors = False
     logs = ""
     killed = False
+    jobType = "none"
 
     # Threads will check this to see if they
     # Should stop processing and exit.
@@ -20,7 +21,7 @@ class JobTracker:
         return JobTracker.done == False
 
     @staticmethod
-    def setJob(name):
+    def setJob(name, jobType):
         if JobTracker.isBusy():
             return False
         JobTracker.name = name
@@ -30,6 +31,7 @@ class JobTracker:
         JobTracker.errors = False
         JobTracker.killed = False
         JobTracker.logs = ""
+        JobTracker.jobType = jobType
     
     @staticmethod
     def getInfo():
@@ -41,6 +43,7 @@ class JobTracker:
             'errors': JobTracker.errors,
             'logs': JobTracker.logs,
             'killed': JobTracker.killed,
+            'type': JobTracker.jobType
         }
     
     @staticmethod
@@ -63,7 +66,7 @@ class JobTracker:
         JobTracker.logs += msg + "\n"
         
     @staticmethod
-    def startInThread(func, label="Processing..."):
+    def startInThread(func, label="Processing...", jobType=""):
         if JobTracker.isBusy():
             return make_response("Busy.", 409)
 
@@ -73,7 +76,7 @@ class JobTracker:
             JobTracker.finishJob()
         
         # Reset old values before starting...
-        JobTracker.setJob(label)
+        JobTracker.setJob(label, jobType)
         threading.Thread(target=wrapper).start()
         return make_response("Job started!", 200)
 

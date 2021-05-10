@@ -23,13 +23,5 @@ def parseArgs(**kwargs):
 
     for key, val in args.items():
         args[key] = os.path.abspath(val)
-    print(args)
-
-    # For now try to catch errors here directly:
-    if not os.path.isdir(args["assgn_dir"])         \
-            or not os.path.isdir(args["src_dir"])   \
-            or not os.path.isfile(args["config"]):
-        print(args)
-        raise ValueError("Arguments don't seem to be correct.")
 
     return args

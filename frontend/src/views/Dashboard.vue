@@ -78,7 +78,7 @@
         </v-sheet>
         <JobTracker
           ref="tracker"
-          @done="showMessage"
+          @done="jobDoneHandler"
           :refreshInterval="500"
         />
   </v-col>
@@ -94,6 +94,8 @@
         indeterminate
         color="green"
         class="ma-10"
+        size="50"
+        style="padding-top: 40%"
       />
         <v-sheet 
           v-if="!loading"
@@ -195,13 +197,21 @@ export default {
           console.log("OH NO COULDN'T KILL")
         })
     },
-    async showMessage(message) {
+    async jobDoneHandler(message, type="") {
       // console.log(message);
       let timeout = 0
       if (this.snackbar) {
         this.snackbar = false;
         timeout = 100;
       }
+      if (type == "download" || type == "run") {
+        this.loading = true;
+        API.getAllResults().then((res) => {
+          this.loading = false;
+          this.items = res;
+        });
+      }
+
       setTimeout(() => {
         this.snackbarText = message;
         this.snackbar = true;
@@ -213,7 +223,7 @@ export default {
         await func();
         this.$refs.tracker.refreshProgress();
       } catch (err) {
-        this.showMessage("Another job is currently running.")
+        this.jobDoneHandler("Another job is currently running.")
       }
     }
   },

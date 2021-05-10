@@ -12,7 +12,7 @@ DATA_FILES = ['gui']
 
 OPTIONS = {'argv_emulation': True,
            'strip': True,
-           #'iconfile': 'icon.icns', # uncomment to include an icon
+           'iconfile': 'extra/icon.icns', # uncomment to include an icon
            'includes': ['WebKit', 'Foundation', 'webview'],
            'packages': [ 'flask', 'jinja2' ]}
 
@@ -20,6 +20,7 @@ packages = find_packages(".")
 # print(packages)
 
 setup(
+    name="Marker",
     packages=packages,  # include all packages under src
     app=APP,
     data_files=DATA_FILES,

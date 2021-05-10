@@ -1,5 +1,12 @@
 import { testresult, config } from "@/lib/marker/fake/data"
 
+function getPlatformPath() {
+    var OSName = "Unknown";
+    if (window.navigator.userAgent.indexOf("Windows NT 10.0")!= -1) OSName="Windows 10";
+    if (OSName.includes("Windows")) { return "c:/" } 
+    else { return "/" }
+}
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -14,7 +21,26 @@ var JOB = {
     logs: "hhh",
 }
 
+var CWD = "/Users/user1"
+
 export default {
+    async getMarkerState() {
+        await sleep(1000);
+        let isValid = (CWD == "/Users/user1/Documents/A1");
+        return {
+            valid: isValid,
+            path: CWD,
+            config: isValid ? config : undefined,
+        }
+    },
+    async setMarkerPath(path) {
+        CWD = path.slice();
+        if (CWD == "/Users/user1/Documents/A1")
+            return { "OK": "OK" };
+        else
+            throw Error("Invalid Dir")
+    },
+
     async getAllResults() {
         let ulist = [
             { username: 'john', marks: [2, 0, 1, 0, 1] },
@@ -32,7 +58,11 @@ export default {
     },
     async getStudentResults(student) {
         await sleep(500)
-        return testresult;
+        return {
+            "data": JSON.stringify(testresult),
+            "path": getPlatformPath(),
+            "marked": "true"
+        };
     },
     async getStats() {
         return {
@@ -59,8 +89,8 @@ export default {
         };
     }, 
     async runTestsSingle(username, recompile) {
-        await sleep(1000);
-        return testresult;
+        await sleep(500);
+        return this.getStudentResults(username);
     },
     async downloadSingle(username, allow_late) {
         await sleep(1000);

@@ -67,11 +67,11 @@ export default {
     },
     onFinish() {
       if (this.job.killed) {
-        this.$emit("done", "Job was killed");
+        this.$emit("done", "Job was killed", this.job.type);
       } else if (this.job.errors) {
-        this.$emit("done", "Job finished with errors");
+        this.$emit("done", "Job finished with errors", this.job.type);
       } else {
-        this.$emit("done", "Job finished");
+        this.$emit("done", "Job finished", this.job.type);
       }
     },
   },

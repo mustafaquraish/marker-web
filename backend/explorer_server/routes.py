@@ -15,6 +15,7 @@ def listdir(path, hidden=False):
             yield f
         elif not f.startswith('.'):
             yield f
+    yield ".."
 
 def getDirData(curPath, hidden=False):
     data = {
