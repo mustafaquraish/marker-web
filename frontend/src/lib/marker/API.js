@@ -1,11 +1,8 @@
 import axios from 'axios';
 import FakeAPI from '@/lib/marker/fake/FakeAPI'
 
-const HOST = "http://127.0.0.1:5000";
-
-var FAKE;
-FAKE = false;
-// FAKE = true;
+const HOST = process.env.VUE_APP_HOST + "/api/marker";
+var FAKE = false;
 
 async function doRequest(func, fakefunc) {
     if (FAKE) {

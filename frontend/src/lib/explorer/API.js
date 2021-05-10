@@ -1,11 +1,8 @@
 import axios from 'axios';
 import FakeAPI from '@/lib/explorer/fake/FakeAPI'
 
-const HOST = "http://127.0.0.1:5000";
-
-var FAKE;
-FAKE = false;
-// FAKE = true;
+const HOST = process.env.VUE_APP_HOST + "/api/explorer";
+var FAKE = false;
 
 async function doRequest(func, fakefunc) {
     if (FAKE) {
@@ -31,21 +28,21 @@ export default {
     async getPath(path, hidden=false) {
         // console.log("Asking for subdir", path)
         return doRequest(
-            () => axios.get(HOST + '/get-path', { params: { path, hidden } }),  /* Real request */
+            () => axios.get(HOST + '/path', { params: { path, hidden } }),  /* Real request */
             () => FakeAPI.getPath(path, hidden),       /* Fake request */
         )
     },
     async getParent(path, hidden=false) {
         // console.log("Asking for parent", path, hidden)
         return doRequest(
-            () => axios.get(HOST + '/get-parent', { params : { path, hidden } }),  /* Real request */
+            () => axios.get(HOST + '/parent', { params : { path, hidden } }),  /* Real request */
             () => FakeAPI.getParent(path, hidden),       /* Fake request */
         )
     },
     async getHome(hidden=false) {
         // console.log("Asking for home", hidden)
         return doRequest(
-            () => axios.get(HOST + '/get-path', { params : { hidden } }),  /* Real request */
+            () => axios.get(HOST + '/path', { params : { hidden } }),  /* Real request */
             () => FakeAPI.getHome(hidden),       /* Fake request */
         )
     },

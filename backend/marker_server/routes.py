@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, jsonify
+from flask import Flask, make_response, request, jsonify, Blueprint
 from flask_cors import CORS
 
 from marker import Marker
@@ -16,7 +16,7 @@ import time
 
 ############################# Init Flask ######################################
 
-from __main__ import app
+markerBP = Blueprint('marker', __name__)
 
 ############################# Global Variables ################################
 
@@ -26,24 +26,24 @@ ARGS = []
 ###############################################################################
 
 
-@app.route('/')
+@markerBP.route('/')
 def route_home():
     message = { 'message': 'Everything is OK here :)' }
     return make_response(message, 200)
 
 
-@app.route('/config', methods=['GET', 'POST'])
+@markerBP.route('/config', methods=['GET', 'POST'])
 def route_config():
     if request.method == 'GET':
         return MARKER.cfg
     else:
         return make_response("This isn't implemented yet :(", 400)
 
-@app.route('/progress')
+@markerBP.route('/progress')
 def route_progress():
     return JobTracker.getInfo()
 
-@app.route('/stopjob', methods=['POST'])
+@markerBP.route('/stopjob', methods=['POST'])
 def route_stop_job():
     JobTracker.setStop()
     for i in range(30):
@@ -59,7 +59,7 @@ def route_stop_job():
 ###############################################################################
 
 
-@app.route('/results/')
+@markerBP.route('/results/')
 def route_results():
     data = MARKER.getMarksheet().data
     if data is None:
@@ -68,7 +68,7 @@ def route_results():
     return jsonify(response)
 
 
-@app.route('/results/<string:student_id>', methods=['GET', 'POST'])
+@markerBP.route('/results/<string:student_id>', methods=['GET', 'POST'])
 def route_single_result(student_id): 
     student_dir = MARKER.getStudentDir(student_id)
     if student_dir is None:
@@ -92,7 +92,7 @@ def route_single_result(student_id):
     student_result["marked"] = True
     return student_result
 
-@app.route('/stats')
+@markerBP.route('/stats')
 def route_stats():
     return MARKER.stats(False, [])
 
@@ -101,7 +101,7 @@ def route_stats():
 ############################# Downloading #####################################
 ###############################################################################
 
-@app.route('/download', methods=['POST'])
+@markerBP.route('/download', methods=['POST'])
 def route_download_all():
     allow_late = request.args.get('allow_late', 'false') == 'true'
     students = [] if request.json is None else request.json
@@ -112,7 +112,7 @@ def route_download_all():
     )
     return make_response("OK", 200)
 
-@app.route('/download/<string:student_id>', methods=['POST'])
+@markerBP.route('/download/<string:student_id>', methods=['POST'])
 def route_download_single(student_id):
     allow_late = request.args.get('allow_late', 'false') == 'true'
     MARKER.download([student_id], allow_late)
@@ -123,7 +123,7 @@ def route_download_single(student_id):
 ############################# Preparing #######################################
 ###############################################################################
 
-@app.route('/prepare', methods=['POST'])
+@markerBP.route('/prepare', methods=['POST'])
 def route_prepare_all():
     students = [] if request.json is None else request.json
     print("Got students:", students)
@@ -132,7 +132,7 @@ def route_prepare_all():
         "Preparing Submissions"
     )
 
-@app.route('/prepare/<string:student_id>', methods=['POST'])
+@markerBP.route('/prepare/<string:student_id>', methods=['POST'])
 def route_prepare_single(student_id):
     MARKER.prepare([student_id])
     return route_single_result(student_id)
@@ -141,7 +141,7 @@ def route_prepare_single(student_id):
 ############################# Running #########################################
 ###############################################################################
 
-@app.route('/run', methods=['POST'])
+@markerBP.route('/run', methods=['POST'])
 def route_run_all():
     recompile = request.args.get('recompile', 'false') == 'true'
     run_all = request.args.get('all', 'false') == 'true'
@@ -152,7 +152,7 @@ def route_run_all():
         "Marking Submissions"
     )
 
-@app.route('/run/<string:student_id>', methods=['POST'])
+@markerBP.route('/run/<string:student_id>', methods=['POST'])
 def route_run_single(student_id):
     recompile = request.args.get('recompile', 'false') == 'true'
     MARKER.run([student_id], recompile, False, False)
@@ -162,7 +162,7 @@ def route_run_single(student_id):
 ######################### Uploading Marks #####################################
 ###############################################################################
 
-@app.route('/upload-marks', methods=['POST'])
+@markerBP.route('/upload-marks', methods=['POST'])
 def route_upload_marks_all():
     students = [] if request.json is None else request.json
     print("Got students:", students)
@@ -171,7 +171,7 @@ def route_upload_marks_all():
         "Uploading Marks"
     )
 
-@app.route('/upload-marks/<string:student_id>', methods=['POST'])
+@markerBP.route('/upload-marks/<string:student_id>', methods=['POST'])
 def route_upload_marks_single(student_id):
     MARKER.upload_marks([student_id])
     return make_response("Uploading marks successful", 200)
@@ -180,7 +180,7 @@ def route_upload_marks_single(student_id):
 ####################### Uploading Reports #####################################
 ###############################################################################
 
-@app.route('/upload-reports', methods=['POST'])
+@markerBP.route('/upload-reports', methods=['POST'])
 def route_upload_reports_all():
     students = [] if request.json is None else request.json
     print("Got students:", students)
@@ -189,7 +189,7 @@ def route_upload_reports_all():
         "Uploading reports"
     )
 
-@app.route('/upload-reports/<string:student_id>', methods=['POST'])
+@markerBP.route('/upload-reports/<string:student_id>', methods=['POST'])
 def route_upload_reports_single(student_id):
     MARKER.upload_reports([student_id])
     return make_response("Uploading reports successful", 200)
@@ -198,7 +198,7 @@ def route_upload_reports_single(student_id):
 ####################### Deleting Reports ##########*###########################
 ###############################################################################
 
-@app.route('/delete-reports', methods=['POST'])
+@markerBP.route('/delete-reports', methods=['POST'])
 def route_delete_reports_all():
     students = [] if request.json is None else request.json
     print("Got students:", students)
@@ -207,7 +207,7 @@ def route_delete_reports_all():
         "Deleting reports"
     )
 
-@app.route('/delete-reports/<string:student_id>', methods=['POST'])
+@markerBP.route('/delete-reports/<string:student_id>', methods=['POST'])
 def route_delete_reports_single(student_id):
     MARKER.delete_reports([student_id])
     return make_response("Deleting reports successful", 200)
@@ -217,7 +217,7 @@ def route_delete_reports_single(student_id):
 ###############################################################################
 
 
-@app.route('/<path:u_path>')
+@markerBP.route('/<path:u_path>')
 def route_catch_all(u_path):
     message = { 'message': 'Roses are red, violets are blue. This page is empty, I can\'t help you :(' }
     return make_response(message, 404)
@@ -236,7 +236,7 @@ def updateMarker(args):
     ARGS = args
     MARKER = Marker(args, WebConsole())
 
-def setup():
+def setupMarker():
     args = parseArgs()
     updateMarker(args)
 

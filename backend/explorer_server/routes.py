@@ -1,11 +1,11 @@
-from flask import request, jsonify
+from flask import request, jsonify, Blueprint
 from flask_cors import CORS
 from .favorites import FavoritesManager
 
 import os
 from pathlib import Path
 
-from __main__ import app
+explorerBP = Blueprint('explorer', __name__)
 
 HOMEDIR = str(Path.home())
 
@@ -34,7 +34,7 @@ def getDirData(curPath, hidden=False):
     data['entries'].sort(key=lambda x: (1-x['dir'], x['name'].lower()))
     return jsonify(data)
 
-@app.route("/get-path")
+@explorerBP.route("/path")
 def route_get_subfolder():
     path = request.args.get('path', HOMEDIR)
     hidden = request.args.get('hidden', 'false') == 'true'
@@ -42,7 +42,7 @@ def route_get_subfolder():
     curPath = os.path.abspath(path)
     return getDirData(curPath, hidden)
 
-@app.route("/get-parent")
+@explorerBP.route("/parent")
 def route_get_parent():
     path = request.args.get('path', "/")
     hidden = request.args.get('hidden', 'false') == 'true'
@@ -52,18 +52,18 @@ def route_get_parent():
     
 FAVORITES = FavoritesManager()
 
-@app.route("/favorites")
+@explorerBP.route("/favorites")
 def route_get_favorites():
     return jsonify(FAVORITES.getFavorites())
 
-@app.route("/favorites", methods=["POST"])
+@explorerBP.route("/favorites", methods=["POST"])
 def route_add_favorite():
     path = request.args.get('path', None)
     if path is not None:
         FAVORITES.addFavorite(path)
     return jsonify(FAVORITES.getFavorites())
 
-@app.route("/favorites", methods=["DELETE"])
+@explorerBP.route("/favorites", methods=["DELETE"])
 def route_del_favorite():
     path = request.args.get('path', None)
     if path is not None:

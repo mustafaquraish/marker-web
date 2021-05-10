@@ -1,11 +1,13 @@
 all:
 	echo "Please select a target explicitly."
 
-.PHONY: gui serve noweb app
+.PHONY: gui webview app backend frontend
 
+#### Build static files for frontend
 gui:
 	cd frontend && npm run build
 
+#### Run webview 
 webview: 
 	python3 backend/main.py -d backend/testing
 
