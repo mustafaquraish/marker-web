@@ -21,7 +21,7 @@ var JOB = {
     logs: "hhh",
 }
 
-var CWD = "/Users/user1"
+var CWD = "/Users/user1/Documents"
 
 export default {
     async getMarkerState() {
