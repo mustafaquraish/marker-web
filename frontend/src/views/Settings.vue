@@ -11,7 +11,7 @@
 
     <div class="display-1"> LMS Specific Configurations </div><br>
     <v-form class="py-3">
-      <v-select     outlined v-model="config.lms"        label="LMS" :items="lmsOptions"/>
+      <v-select     outlined v-model="config.lms"        label="LMS" :items="lmsOptions" clearable/>
       <v-text-field outlined v-model="config.base_url"   label="Base URL"/>
       <v-text-field outlined v-model="config.course"     label="Course ID"        v-if="config.lms == 'canvas'"/>
       <v-text-field outlined v-model="config.assignment" label="Assignment ID"/>
