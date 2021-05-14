@@ -7,18 +7,17 @@ all:
 gui:
 	cd frontend && npm run build
 
-#### Run webview 
 webview: 
-	python3 backend/main.py -d backend/testing
+	python3 -m marker_web.ui -d testing
 
 #### Run ONLY the backend server
 backend:
-	python3 backend/main.py noweb -d backend/testing
+	python3 -m marker_web.server -d testing
 
 #### Run ONLY the frontend server
 frontend:
 	cd frontend && npm run serve
 
-#### Compile .app file for MacOS
+#### Create MacOS executable
 app:
-	python3 setup.py py2app --no-chdir
+	python3 extra/freeze-setup.py py2app --no-chdir

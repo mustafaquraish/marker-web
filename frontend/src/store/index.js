@@ -14,7 +14,15 @@ export default new Vuex.Store({
       path: null,
       config: undefined,
       error: false,
-    }
+    },
+    tokenDialog: false,
+
+    errorDialog: false,
+    errorMessage: "Unknown error occurred.",
+    errorTitle: "Error",
+
+    snackBar: false,
+    snackMessage: "Unknown Error",
   },
   mutations: {
     updateMobile(state) {
@@ -26,8 +34,34 @@ export default new Vuex.Store({
       state.markerState['error'] = error;
       state.markerState['loaded'] = true;
     },
+    setTokenDialog(state, bool) { state.tokenDialog = bool;},
+
+    setErrorDialog(state, bool) { state.errorDialog = bool;},
+    setErrorMessage(state, text) { state.errorMessage = text;},
+    setErrorTitle(state, text) { state.errorTitle = text;},
+
+    setSnackBar(state, bool) { state.snackBar = bool; },
+    setSnackMessage(state, text) { state.snackMessage = text;},
   },
   actions: {
+    async showSnackBar({ commit }, text="Unknown Error") {
+      let timeout = 0
+      if (this.state.snackBar) {
+        commit('setSnackBar', false)
+        timeout = 100;
+      }
+      commit('setSnackMessage', text)
+      setTimeout(() => {
+        commit('setSnackBar', true)
+      }, timeout)
+    },
+    async showErrorDialog({ commit }, info) {
+      let message = info.message;
+      let title = info.title || "Error";
+      commit('setErrorMessage', message)
+      commit('setErrorTitle', title)
+      commit('setErrorDialog', true)
+    },
     async fetchMarkerState({ commit }, func) {
       try {
         let data = await func();

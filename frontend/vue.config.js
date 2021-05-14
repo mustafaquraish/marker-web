@@ -5,7 +5,7 @@ module.exports = {
     'vuetify'
   ],
   publicPath: '',  
-  outputDir: path.resolve(__dirname, "../gui"),
+  outputDir: path.resolve(__dirname, "../marker_web/gui"),
   chainWebpack: config => {
     config
       .plugin('html')

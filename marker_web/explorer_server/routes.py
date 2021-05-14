@@ -39,7 +39,13 @@ def getDirData(curPath, hidden=False):
 def route_get_subfolder():
     path = request.args.get('path', HOMEDIR)
     hidden = request.args.get('hidden', 'false') == 'true'
-
+    print()
+    print()
+    print()
+    print("GOT PATH:", path)
+    print()
+    print()
+    print()
     curPath = os.path.abspath(path)
     return getDirData(curPath, hidden)
 
@@ -70,10 +76,3 @@ def route_del_favorite():
     if path is not None:
         FAVORITES.removeFavorite(path)
     return jsonify(FAVORITES.getFavorites())
-
-
-
-
-
-if __name__ == '__main__':
-    app.run()
