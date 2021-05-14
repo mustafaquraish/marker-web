@@ -1,9 +1,5 @@
-from server import app
-from marker_server.routes import setupMarker
-
+from . import app, setupMarker
 import webview
-
-
 
 def main():
     # Try to run setup the marker in the current directory, but this

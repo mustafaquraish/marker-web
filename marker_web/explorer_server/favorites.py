@@ -17,7 +17,6 @@ class FavoritesManager():
         try:
             with open(name) as handle:
                 self.data = json.load(handle)
-            print("Loaded", self.data)
         except FileNotFoundError:
             self.data = []
     

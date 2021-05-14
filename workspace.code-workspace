@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"name": "vue-root",
+			"path": "frontend"
+		},
+		{
+			"name": "vue-src",
+			"path": "frontend/src"
+		},
+		{
+			"name": "server",
+			"path": "marker_web"
+		},
+		{
+			"path": "testing"
+		}
+	],
+	"settings": {}
+}

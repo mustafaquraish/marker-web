@@ -7,7 +7,7 @@ Usage:
 
 from setuptools import setup, find_packages
 
-APP = ['backend/main.py']
+APP = ['marker-web/ui.py']
 DATA_FILES = ['gui']
 
 OPTIONS = {'argv_emulation': True,

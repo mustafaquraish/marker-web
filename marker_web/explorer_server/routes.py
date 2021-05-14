@@ -70,10 +70,3 @@ def route_del_favorite():
     if path is not None:
         FAVORITES.removeFavorite(path)
     return jsonify(FAVORITES.getFavorites())
-
-
-
-
-
-if __name__ == '__main__':
-    app.run()
