@@ -1,6 +1,7 @@
 import asyncio
 
 from marker.utils.console import ConsoleABC
+from marker.utils.token import TokenNotFoundError
 from .jobs import JobTracker
 
 class WebConsole(ConsoleABC):
@@ -37,8 +38,11 @@ class WebConsole(ConsoleABC):
             try:
                 result = await task
                 results.append(result)
+            except TokenNotFoundError:
+                raise
             except Exception as e:
-                print("Exception occured:", e)
+                self.error("Exception occured:", e)
+
             JobTracker.updateProgress(1)
             if JobTracker.shouldExitNow:
                 JobTracker.threadExit()

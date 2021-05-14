@@ -1,5 +1,6 @@
 import axios from 'axios';
 import FakeAPI from '@/lib/marker/fake/FakeAPI'
+import store from '@/store/index.js'
 
 const HOST = process.env.VUE_APP_HOST + "/api/marker";
 var FAKE = false;
@@ -11,11 +12,11 @@ async function doRequest(func, fakefunc) {
     try {
         let resp = await func();
         return resp.data;
-    } catch (error) {
+    } catch (err) {
         // This is an error thrown from the marker, caller handles
-        if (error.response) {
+        if (err.response) {
             console.log("Error occured, but caller should handle this one...")
-            throw error;
+            return Promise.reject(err)
         } else {
             FAKE = true;
             console.log("Could not connect to server, defaulting to fake data")
@@ -24,20 +25,53 @@ async function doRequest(func, fakefunc) {
     }
 }
 
+async function handleReponse(func, fakefunc) {
+    try {
+        return await doRequest(func, fakefunc);
+    } catch (err) {
+        console.log("GOT ERROR:", err)
+        if (!err.response.data || !err.response.data.message) {
+            store.dispatch('showSnackBar', "Unknown error")
+            return Promise.reject(err)
+        }
+        let message = err.response.data.message;
+        if (message == "no_token") {
+            store.commit('setTokenDialog', true)
+        } else if (message == "busy") {
+            store.dispatch('showSnackBar', "Another job is currently running.")
+        } else {
+            store.dispatch('showErrorDialog', {
+                message: err.response.data.message
+            })
+            store.commit('setErrorMessage', err.response.data.message)
+        }
+        return Promise.reject(err)
+    }
+}
+
 export default {
     ////////////////////////////////////////////////////////////////////////////////////
     
     async getMarkerState() {
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/state"),     /* Real request */
             () => FakeAPI.getMarkerState(),       /* Fake request */
         )
     },
 
     async setMarkerPath(path) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/state", null, { params: { path } }),  /* Real request */
             () => FakeAPI.setMarkerPath(path),                              /* Fake request */
+        )
+    },
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    
+    async saveToken(token) {
+        return handleReponse(
+            () => axios.post(HOST + "/tokens", null, { params: { token } }),     /* Real request */
+            () => FakeAPI.noop(),       /* Fake request */
         )
     },
     
@@ -46,14 +80,14 @@ export default {
 
     async getAllResults() {
         // console.log("Asking for all results...")
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/results"),  /* Real request */
             () => FakeAPI.getAllResults(),       /* Fake request */
         )
     },
 
     async getStudentResults(student) {
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/results/" + student),  /* Real request */
             () => FakeAPI.getStudentResults(),       /* Fake request */
         )
@@ -62,7 +96,7 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async getStats() {
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/stats"),  /* Real request */
             () => FakeAPI.getStats(),       /* Fake request */
         )
@@ -71,14 +105,14 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async downloadSingle(username, allow_late) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/download/" + username, null, { params: { allow_late } }),  /* Real request */
             () => FakeAPI.downloadSingle(),       /* Fake request */
         )
     },
 
     async downloadAll(usernames, allow_late) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/download", usernames, { params: { allow_late } }),  /* Real request */
             () => FakeAPI.runJob("Downloading Submissions"),       /* Fake request */
         )
@@ -87,14 +121,14 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async prepareSingle(username) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/prepare/" + username, null),  /* Real request */
             () => FakeAPI.downloadSingle(),       /* Fake request */
         )
     },
 
     async prepareAll(usernames) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/prepare", usernames),  /* Real request */
             () => FakeAPI.runJob("Preparing Submissions"),       /* Fake request */
         )
@@ -103,13 +137,13 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async runTestsSingle(username, recompile) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/run/" + username, null, { params: { recompile } }),  /* Real request */
             () => FakeAPI.runTestsSingle(),       /* Fake request */
         )
     },
     async runTestsAll(usernames, recompile) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/run", usernames, { params: { recompile } }),  /* Real request */
             () => FakeAPI.runJob("Running tests"),       /* Fake request */
         )
@@ -118,14 +152,14 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async uploadMarksSingle(username) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/upload-marks/" + username, null),  /* Real request */
             () => FakeAPI.downloadSingle(),                              /* Fake request */
         )
     },
 
     async uploadMarksAll(usernames) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/upload-marks", usernames),  /* Real request */
             () => FakeAPI.runJob("Uploading Marks"),              /* Fake request */
         )
@@ -134,14 +168,14 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async uploadReportsSingle(username) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/upload-reports/" + username, null),  /* Real request */
             () => FakeAPI.downloadSingle(),                                /* Fake request */
         )
     },
 
     async uploadReportsAll(usernames) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/upload-reports", usernames),  /* Real request */
             () => FakeAPI.runJob("Uploading Reports"),              /* Fake request */
         )
@@ -150,43 +184,61 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async deleteReportsSingle(username) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/delete-reports/" + username, null),  /* Real request */
             () => FakeAPI.downloadSingle(),                                /* Fake request */
         )
     },
 
     async deleteReportsAll(usernames) {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/delete-reports", usernames),  /* Real request */
             () => FakeAPI.runJob("Deleting Reports"),               /* Fake request */
         )
     },
 
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    async setStatusSingle(status, username) {
+        return handleReponse(
+            () => axios.post(HOST + "/set-status/" + username, null, { params: { status } }),  /* Real request */
+            () => FakeAPI.downloadSingle(),                                /* Fake request */
+        )
+    },
+
+    async setStatusAll(status, usernames) {
+        return handleReponse(
+            () => axios.post(HOST + "/set-status", usernames, { params: { status } }),  /* Real request */
+            () => FakeAPI.runJob("Setting status " + status),               /* Fake request */
+        )
+    },
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    
 
     async getConfig() {
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/config"),  /* Real request */
             () => FakeAPI.getConfig(),          /* Fake request */
         )
     },
 
     async getJob() {
-        return doRequest(
+        return handleReponse(
             () => axios.get(HOST + "/progress"),  /* Real request */
             () => FakeAPI.getJob(),               /* Fake request */
         )
     },
 
     async runJob() {
-        return doRequest(
+        return handleReponse(
             () => FakeAPI.runJob(),       /* Real request */
             () => FakeAPI.runJob(),       /* Fake request */
         )
     },
 
     async stopJob() {
-        return doRequest(
+        return handleReponse(
             () => axios.post(HOST + "/stopjob"),  /* Real request */
             () => FakeAPI.stopJob(),              /* Fake request */
         )

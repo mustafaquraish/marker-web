@@ -1,4 +1,6 @@
+import json
 from flask import make_response
+from marker.utils.token import TokenNotFoundError
 import threading 
 import sys
 
@@ -32,10 +34,14 @@ class JobTracker:
         JobTracker.killed = False
         JobTracker.logs = ""
         JobTracker.jobType = jobType
+        JobTracker.tokenMissing = False
     
     @staticmethod
     def getInfo():
-        return { 
+        if JobTracker.tokenMissing:
+            raise TokenNotFoundError("Could not find token")
+
+        info = { 
             'name': JobTracker.name,
             'progress': JobTracker.progress,
             'total': JobTracker.total,
@@ -45,6 +51,8 @@ class JobTracker:
             'killed': JobTracker.killed,
             'type': JobTracker.jobType
         }
+        # print(json.dumps(info, indent=2))
+        return info
     
     @staticmethod
     def setTotal(total):
@@ -59,21 +67,47 @@ class JobTracker:
     def finishJob():
         JobTracker.done = True
         JobTracker.progress = JobTracker.total
-        print("Job done :)")
+        JobTracker.shouldExitNow = False
+        print("Job finished")
 
     @staticmethod
     def addMessage(msg):
         JobTracker.logs += msg + "\n"
         
     @staticmethod
-    def startInThread(func, label="Processing...", jobType=""):
+    def runSync(func):
         if JobTracker.isBusy():
-            return make_response("Busy.", 409)
+            raise Exception("busy")
+
+        JobTracker.setJob("Processing", "sync")
+
+        try:
+            ret = func()
+        finally:
+            JobTracker.finishJob()
+        
+        if JobTracker.errors:
+            raise Exception(JobTracker.logs)
+
+        # Reset old values before starting...
+        return ret
+    
+    @staticmethod
+    def runAsync(func, label="Processing...", jobType=""):
+        if JobTracker.isBusy():
+            raise Exception("busy")
 
         # Make an auxiliary function that always runs `finishJob`
         def wrapper():
-            func()
-            JobTracker.finishJob()
+            try:
+                func()
+            except BaseException as e:
+                JobTracker.logs += str(e)
+                JobTracker.killed = True
+                if isinstance(e, TokenNotFoundError):
+                    JobTracker.tokenMissing = True
+            finally:
+                JobTracker.finishJob()
         
         # Reset old values before starting...
         JobTracker.setJob(label, jobType)
@@ -91,10 +125,8 @@ class JobTracker:
     @staticmethod
     def threadExit():
         JobTracker.addMessage("STOP: The job was stopped")
-        JobTracker.done = True
-        JobTracker.total = 0
-        JobTracker.shouldExitNow = False
-        JobTracker.errors = True
         JobTracker.killed = True
+        JobTracker.total = 0
         print("Killing thread now.")
+        JobTracker.finishJob()
         sys.exit()

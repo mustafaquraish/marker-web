@@ -7,14 +7,13 @@ Usage:
 
 from setuptools import setup, find_packages
 
-APP = ['marker-web/ui.py']
-DATA_FILES = ['gui']
+APP = ['marker_web/ui.py']
 
 OPTIONS = {'argv_emulation': True,
            'strip': True,
            'iconfile': 'extra/icon.icns', # uncomment to include an icon
            'includes': ['WebKit', 'Foundation', 'webview'],
-           'packages': [ 'flask', 'jinja2' ]}
+           'packages': [ 'marker_web' ]}
 
 packages = find_packages(".")
 # print(packages)
@@ -23,7 +22,6 @@ setup(
     name="Marker",
     packages=packages,  # include all packages under src
     app=APP,
-    data_files=DATA_FILES,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
 )

@@ -1,4 +1,4 @@
-from . import app, setupMarker
+from marker_web import app, setupMarker
 import webview
 
 def main():

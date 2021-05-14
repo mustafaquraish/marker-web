@@ -66,7 +66,7 @@
         </v-card-title>
 
         <v-card-text class="mt-5">
-          The directory you selected (<code>{{directory}}</code>) does not contain a configuration file. Please select a valid directory to see results.
+          The directory you selected (<code>{{directory}}</code>) does not contain a valid configuration file. Please select a valid directory to see results, or make sure that the configuration file is a valid YAML file.
         </v-card-text>
 
         <v-divider></v-divider>

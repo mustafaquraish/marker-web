@@ -48,7 +48,7 @@ def main():
     # anything here, user will be prompted to pick dir in UI.
     setupMarker()
 
-    app.run()
+    app.run(debug=True, use_reloader=True)
 
 if __name__ == '__main__':
     main()

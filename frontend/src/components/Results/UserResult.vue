@@ -57,7 +57,7 @@
             color="#8b9ef0" 
             width="200"
             class="ma-2"
-            v-if="result && result.path && !mobile"
+            v-if="result && result.path"
             :href="'vscode://file/'+result.path"
             target="_blank"
           > 
@@ -137,24 +137,6 @@
       />
 
     </div>
-
-    <v-snackbar
-      v-model="snackbar"
-    >
-      {{snackbarText}}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="pink"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
   </div>
 </template>
 
@@ -174,8 +156,6 @@
     data: () => ({ 
       loading: false,
       result: null,
-      snackbar: false,
-      snackbarText: "",
       downloading: false,
     }),
     beforeMount() {
@@ -213,8 +193,7 @@
         await this.handleResult(
           ()=>API.runTestsSingle(this.username, recompile)
         )
-        this.snackbarText = "Finished running tests!"
-        this.snackbar = true;
+        this.$store.dispatch("showSnackBar", "Finished running tests!")
         this.$emit('updateMarks', this.username, this.result.marks);
       },
       reDownload() {
@@ -222,14 +201,11 @@
         API.downloadSingle(this.username, false)
            .then((res) => {
               this.downloading = false
-              this.snackbarText = "Finished downloading files!"
-              this.snackbar = true;
+              this.$store.dispatch("showSnackBar", "Finished downloading files!")
            })
-      }
-    },
-    computed: {
-      mobile() {
-        return this.$store.state.isMobile;
+           .catch((err) => {
+             this.downloading = false
+           })
       }
     },
   }

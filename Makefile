@@ -20,4 +20,4 @@ frontend:
 
 #### Create MacOS executable
 app:
-	python3 extra/freeze-setup.py install --no-chdir
+	python3 extra/freeze-setup.py py2app --no-chdir

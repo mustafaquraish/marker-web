@@ -18,23 +18,9 @@
         </template>
       </v-progress-linear>
 
-      <v-dialog v-model="dialog" width="70%">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn class="mt-4" dark v-bind="attrs" v-on="on" width="200" light>
-            View logs
-          </v-btn>
-        </template>
-
-        <v-card>
-          <v-card-title class="headline grey lighten-2">
-            {{ job.name }} (Logs)
-          </v-card-title>
-          <v-card-text>
-              <pre v-if="job.logs">{{job.logs}}</pre>
-              <pre v-if="!job.logs">No logs generated for the job.</pre>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+      <v-btn class="mt-4" dark @click="showDialog" width="200" light>
+        View logs
+      </v-btn>
 
     </div>
   </v-sheet>
@@ -57,6 +43,7 @@ export default {
   methods: {
     async refreshProgress() {
       this.job = await API.getJob();
+      console.log(this.job)
       if (this.job && this.job.done) {
         this.onFinish();
       } else {
@@ -65,17 +52,32 @@ export default {
         }, this.refreshInterval);
       }
     },
+    showDialog() {
+      this.$store.dispatch("showErrorDialog", {
+        message: this.logsText, 
+        title: this.job.name + " (Logs)"
+      })
+    },
     onFinish() {
       if (this.job.killed) {
-        this.$emit("done", "Job was killed", this.job.type);
+        this.$emit("done", "Job was Stopped", this.job.type);
       } else if (this.job.errors) {
         this.$emit("done", "Job finished with errors", this.job.type);
       } else {
         this.$emit("done", "Job finished", this.job.type);
       }
+      if (this.job.errors) {
+        this.showDialog()
+      }
     },
   },
   computed: {
+    logsText() {
+      if (!this.job || !this.job.logs) {
+        return "No logs generated for the job."
+      }
+      return this.job.logs;
+    },
     jobColor() {
       if (this.job.killed) {
         return "red lighten-4";

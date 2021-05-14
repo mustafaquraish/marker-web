@@ -81,17 +81,19 @@
     <v-main>
       <router-view v-if="!markerState.loading"></router-view>
     </v-main>
+    <Errors></Errors>
   </v-app>
 </div>  
 </template>
 
 <script>
-import API from '@/lib/marker/API'
 import FileExplorer from '@/views/FileExplorer.vue'
+import Errors from '@/components/Errors.vue'
 
 export default {
   components: {
-    FileExplorer
+    FileExplorer,
+    Errors,
   },
   data: () => ({ 
     drawer: null,

@@ -21,11 +21,17 @@ var JOB = {
     logs: "hhh",
 }
 
-var CWD = "/Users/user1"
+var CWD = "/Users/user1/Documents/A1"
+
+function ERROR(message) {
+    return Promise.reject({response: { data: { message }}})
+}
 
 export default {
+    async noop() {
+        return {  };
+    },
     async getMarkerState() {
-        await sleep(1000);
         let isValid = (CWD == "/Users/user1/Documents/A1");
         return {
             valid: isValid,
@@ -54,6 +60,7 @@ export default {
         for (let i = 0; i < 2; i++) {
             ulist = ulist.concat(ulist);
         }
+        console.log("RETURNING ....", ulist)
         return ulist;
     },
     async getStudentResults(student) {
@@ -102,7 +109,7 @@ export default {
     },
     async runJob(name="Downloading") {
         if (JOB.done == false) {
-            throw Error("Another job is running");
+            return ERROR("busy")
         }
         // console.log("Resetting the job...")
         JOB.name = name
@@ -130,6 +137,8 @@ export default {
     async stopJob() {
         if (!JOB.done) {
             JOB.killed = true;
+            JOB.total = 0;
+            JOB.progress = 0;
         }
         await sleep(1);
         return {"ok": "dude"}

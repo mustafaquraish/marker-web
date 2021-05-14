@@ -34,7 +34,7 @@
             </v-btn><br>
           
             <div v-if="config.lms == 'markus'">
-              <v-btn color="#bbd565"> 
+              <v-btn color="#bbd565" @click="setStatusDialog = true"> 
                 <v-icon>mdi-file-upload</v-icon>
                 <v-spacer/>Set Status<v-spacer/>
               </v-btn><br>
@@ -86,22 +86,22 @@
   </v-col>
 </v-row>
 
-<v-snackbar
-  v-model="snackbar"
->
-  {{snackbarText}}
-
-  <template v-slot:action="{ attrs }">
-    <v-btn
-      color="pink"
-      text
-      v-bind="attrs"
-      @click="snackbar = false"
-    >
-      Close
-    </v-btn>
-  </template>
-</v-snackbar>
+  <v-dialog v-model="setStatusDialog" width="500">
+    <v-card>
+      <v-card-title class="headline grey lighten-2">Set status</v-card-title>
+      <v-card-text class="mt-4" style="font-size: 12pt">
+          Please select the status:            
+      </v-card-text>
+      <v-divider/>
+      <v-card-actions>
+        <v-spacer/>
+        <v-btn color="primary" width="200" text @click="statusClick('complete')">Complete</v-btn>
+        <v-spacer/>
+        <v-btn color="primary" width="200" text @click="statusClick('incomplete')">Incomplete</v-btn>
+        <v-spacer/>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
 </div>
 </template>
@@ -126,7 +126,8 @@ export default {
     items: null,
     job: null,
     snackbar: false,
-    snackbarText: ""
+    snackbarText: "",
+    setStatusDialog: false,
   }),
   methods: {
     selectedUsers() {
@@ -147,20 +148,17 @@ export default {
     uploadReportsClick(recompile) {
       this.runJob(()=>API.uploadReportsAll(this.selectedUsers()));
     },
+    statusClick(status) {
+      this.setStatusDialog = false;
+      this.runJob(()=>API.setStatusAll(status, this.selectedUsers()));
+    },
     async stopJobClick() {
-      try {
-        await API.stopJob()
-      } catch (e) {
-        console.log("Error stopping", e);
-      }
+      await API.stopJob()
     },
     async jobDoneHandler(message, type="") {
       // console.log(message);
-      let timeout = 0
-      if (this.snackbar) {
-        this.snackbar = false;
-        timeout = 100;
-      }
+      this.$store.dispatch('showSnackBar', message);
+
       if (type == "download" || type == "run") {
         this.loading = true;
         API.getAllResults().then((res) => {
@@ -168,18 +166,13 @@ export default {
           this.items = res;
         });
       }
-
-      setTimeout(() => {
-        this.snackbarText = message;
-        this.snackbar = true;
-      }, timeout)
     },
     async runJob(func) {
       try {
         await func();
         this.$refs.tracker.refreshProgress();
       } catch (err) {
-        this.jobDoneHandler("Another job is currently running.")
+        // Nothing.
       }
     }
   },
