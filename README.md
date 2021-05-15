@@ -1,6 +1,8 @@
 # Marker-Web
 
-This is a Flask-backend and Vue-JS frontend for the [`marker` library](https://github.com/mustafaquraish/marker)
+This is a Flask-backend and Vue.js frontend for the [*marker* library](https://github.com/mustafaquraish/marker). The
+
+[Try it out with dummy data!](https://mustafaquraish.github.io/marker-web/#/) (Mobile friendly too)
 
 ---
 
