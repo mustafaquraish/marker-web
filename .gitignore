@@ -50,3 +50,5 @@ dist
 venv
 .eggs
 gui
+
+*.code-workspace
