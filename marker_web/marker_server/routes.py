@@ -1,7 +1,7 @@
 from flask import Flask, make_response, request, jsonify, Blueprint
 from flask_cors import CORS
 
-from marker import Marker
+from marker import Marker, TokenNotFoundError
 from marker.utils import config
 from marker.utils import pushd
 from marker.utils.marksheet import Marksheet
@@ -42,16 +42,10 @@ def route_set_path():
     path = request.args.get('path', None)
     if path is None:
         return make_response("Path not included", 400)
-    print(".....??")
-    print(".....??")
-    print(".....??")
-    print(".....??")
     args = parseArgs(assgn_dir=path)
-    print("args:", args)
     if updateMarker(args):
         return make_response("Success", 200)
     else:
-        print(":((((((((((")
         return make_response("Path isn't valid", 400)
 
 
@@ -92,8 +86,6 @@ def route_stop_job():
 @markerBP.route('/tokens', methods=['POST'])
 def route_save_token():
     token = request.args.get('token', None)
-    print(request.args)
-    print("Got token:", token)
     MARKER.lms.save_token(token)
     return make_response("Saved.", 200)
 
@@ -140,7 +132,7 @@ def route_single_result(student_id):
 
 @markerBP.route('/stats')
 def route_stats():
-    return MARKER.stats(False, [])
+    return MARKER.stats([])
 
 
 ###############################################################################
@@ -151,7 +143,6 @@ def route_stats():
 def route_download_all():
     allow_late = request.args.get('allow_late', 'false') == 'true'
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.download(students, False),
         "Downloading Submissions", "download"
@@ -173,7 +164,6 @@ def route_download_single(student_id):
 @markerBP.route('/prepare', methods=['POST'])
 def route_prepare_all():
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.prepare(students),
         "Preparing Submissions", "prepare"
@@ -195,7 +185,6 @@ def route_run_all():
     recompile = request.args.get('recompile', 'false') == 'true'
     run_all = request.args.get('all', 'false') == 'true'
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.run(students, recompile, run_all, False),
         "Marking Submissions", "run"
@@ -216,7 +205,6 @@ def route_run_single(student_id):
 @markerBP.route('/upload-marks', methods=['POST'])
 def route_upload_marks_all():
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.upload_marks(students),
         "Uploading Marks", "upload-marks"
@@ -236,7 +224,6 @@ def route_upload_marks_single(student_id):
 @markerBP.route('/upload-reports', methods=['POST'])
 def route_upload_reports_all():
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.upload_reports(students),
         "Uploading reports", "upload-reports"
@@ -256,7 +243,6 @@ def route_upload_reports_single(student_id):
 @markerBP.route('/delete-reports', methods=['POST'])
 def route_delete_reports_all():
     students = [] if request.json is None else request.json
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.delete_reports(students),
         "Deleting reports", "delete-reports"
@@ -278,7 +264,6 @@ def route_set_status_all():
     students = [] if request.json is None else request.json
     status = request.args.get('status', 'incomplete')
 
-    print("Got students:", students)
     return JobTracker.runAsync(lambda:
         MARKER.set_status(status, students),
         "Setting status " + status, "set-status"
@@ -295,8 +280,6 @@ def route_set_status_single(student_id):
 ###############################################################################
 ###############################################################################
 ###############################################################################
-
-from marker.utils.token import TokenNotFoundError
 
 @markerBP.errorhandler(TokenNotFoundError)
 def route_token_not_found(exc):

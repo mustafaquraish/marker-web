@@ -5,7 +5,15 @@
           <div v-for="(item, i) in values" :key="i">
             <v-list-item class="mb-0" @click="clickedItem(item)">
               <v-list-item-icon>
-                <v-icon color="teal">mdi-star</v-icon>
+                <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon color="teal" @click.stop="clickedStar(item)" v-on="on" v-bind="attrs">
+                    mdi-star
+                  </v-icon>
+                </template>
+                Remove Favorite
+              </v-tooltip>
+                
               </v-list-item-icon>
 
               <v-list-item-content>
@@ -27,6 +35,9 @@ export default {
     methods: {
         clickedItem(item) {
           this.$emit('folderClicked', item)
+        },
+        clickedStar(item) {
+          this.$emit('removeFav', item)
         }
     }
 }

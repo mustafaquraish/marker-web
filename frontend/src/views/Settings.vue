@@ -9,6 +9,10 @@
 
   <div v-if="config" class="pa-10">
 
+    <v-alert type="info" class="mb-5" outlined>
+      For now this page is read-only, and does not update the configuration file. To make any changes, please update the configuration file manually and re-launch the marker.
+    </v-alert>
+
     <div class="display-1"> LMS Specific Configurations </div><br>
     <v-form class="py-3">
       <v-select     outlined v-model="config.lms"        label="LMS" :items="lmsOptions" clearable/>

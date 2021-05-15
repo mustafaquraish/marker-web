@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
     name='marker-web',
-    version='1.0',
+    version='1.0.0',
     entry_points={
     'console_scripts': [
             'marker-web = marker_web.server:main',
@@ -18,7 +18,7 @@ setuptools.setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'marker', 'flask', 'flask_cors'
+        'marker>=2.1.0', 'flask', 'flask_cors'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

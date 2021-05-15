@@ -60,7 +60,6 @@ export default {
         for (let i = 0; i < 2; i++) {
             ulist = ulist.concat(ulist);
         }
-        console.log("RETURNING ....", ulist)
         return ulist;
     },
     async getStudentResults(student) {
@@ -76,6 +75,7 @@ export default {
             "total_marked": 248,
             "compile_success": 153,
             "compile_failed": 95,
+            "out_of": 6,
             "all": {
                 "mean": 2.91,
                 "median": 3
@@ -111,16 +111,15 @@ export default {
         if (JOB.done == false) {
             return ERROR("busy")
         }
-        // console.log("Resetting the job...")
         JOB.name = name
         JOB.progress = 0;
         JOB.killed = false;
         JOB.done = false;
         JOB.logs = "";
+        JOB.total = 100;
         return { "started": "ok" };
     },
     async getJob() {
-        // console.log("Asking for progress:")
         let done = JOB.progress >= 100 || JOB.killed;
         if (!done) {
             JOB.progress += Math.floor(Math.random() * 20);

@@ -7,9 +7,17 @@
     <v-app-bar 
       v-if="username"
     >
-      <v-toolbar-title class="flex text-center">
+      <v-icon
+        v-if="mobile"
+        @click="$router.go(-1)"
+      >
+        mdi-arrow-left
+      </v-icon>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>
         {{username.toUpperCase()}}
       </v-toolbar-title>
+      <v-spacer></v-spacer>
     </v-app-bar>
 
     <div
@@ -21,24 +29,24 @@
         justify="space-around"
       >   
           <v-btn 
-            color="#0cc0b4" 
+            color="#90CAF9" 
             width="200"
             class="ma-2"
             @click="runTests(false)"
           > 
-            Run tests (as is)
+            Prepare Submission
           </v-btn>
           <v-btn 
-            color="#86fa3d" 
+            color="#90CAF9" 
             width="200"
             class="ma-2"
             @click="runTests(true)"
           > 
-            Run tests (recompile)
+            Recompile and Run
           </v-btn>
           
           <v-btn 
-            color="#eaea24" 
+            color="#bbd565" 
             width="200"
             class="ma-2"
             @click="reDownload"
@@ -54,12 +62,12 @@
 
 
           <v-btn 
-            color="#8b9ef0" 
+            color="#ca85d6" 
             width="200"
             class="ma-2"
-            v-if="result && result.path"
-            :href="'vscode://file/'+result.path"
             target="_blank"
+            :disabled="!result || !result.path"
+            :href="'vscode://file/'+dirPath"
           > 
             Open in VSCode 
           </v-btn>
@@ -67,8 +75,6 @@
       
     </div>
 
-    <v-divider/>
-    
     <div 
       class="text-center mt-10" 
       v-if="username && loading"
@@ -91,13 +97,18 @@
     </div>
 
     <div v-if="result && result.marked && !loading && result.json">
-      <body class="body-1 pa-4">
-        Total marks: {{ result.total }}
+      <body class="body-1 mt-0 mx-5 mb-1">
+        <v-progress-linear 
+          height="50" 
+          :value="100* result.total / result.out_of"
+          :color="result.total == 0 ? 'red lighten-2' : '#bbd565'" 
+          style="border-radius:30px"
+          >
+          Total: {{result.total}} / {{result.out_of}} marks
+        </v-progress-linear>
       </body>
 
-      <v-divider/>
-
-      <v-list-group>
+      <v-list-group class="mt-5">
         <template v-slot:activator>
           <v-list-item-icon>
               <v-icon :color="result.compiled ? 'success' : 'error'">
@@ -112,19 +123,18 @@
           </v-list-item-content>
         </template>
 
-        <v-list-item
-          disabled
+        <div
+          style="color: black; background-color: #f5f5f5"
+          class="pa-5"
         >
-          <v-list-item-content>
-            <div v-if="result.compile_log != ''">
-              Compilation Logs:
-              <pre>{{result.compile_log}}</pre>
-            </div>
-            <p v-if="result.compile_log == ''">
-              No compilation output was generated.
-            </p>
-          </v-list-item-content>
-        </v-list-item>
+          <div v-if="result.compile_log != ''">
+            <li>Compilation Logs:</li>
+            <pre>{{result.compile_log}}</pre>
+          </div>
+          <span v-if="result.compile_log == ''">
+            <li>No compilation output was generated.</li>
+          </span>
+        </div>
       </v-list-group>
       
       <v-divider/>
@@ -164,6 +174,15 @@
     watch: {
       username() {
         this.refreshResults()
+      }
+    },
+    computed: {
+      mobile() {
+        return this.$store.state.isMobile;
+      },
+      dirPath() {
+        if (!this.result || !this.result.path) return "";
+        return this.result.path
       }
     },
     methods: {
@@ -213,7 +232,8 @@
 
 <style>
 pre {
-  background-color: rgb(240, 240, 240);
+  background-color: white;
+  border: 1px solid #888888;
   font-family: 'Monaco', monospace;
   padding: 1em;
   overflow: hidden;

@@ -7,20 +7,21 @@ Usage:
 
 from setuptools import setup, find_packages
 
-APP = ['marker_web/ui.py']
-
+APP = ['extra/ui.py']
+DATA_FILES = ['./marker_web/gui']
 OPTIONS = {'argv_emulation': True,
            'strip': True,
            'iconfile': 'extra/icon.icns', # uncomment to include an icon
            'includes': ['WebKit', 'Foundation', 'webview'],
-           'packages': [ 'marker_web' ]}
+           'resources': ['./marker_web/gui']
+           }
 
 packages = find_packages(".")
-# print(packages)
 
 setup(
     name="Marker",
     packages=packages,  # include all packages under src
+    data_files=DATA_FILES,
     app=APP,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],

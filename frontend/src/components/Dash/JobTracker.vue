@@ -9,10 +9,10 @@
         :color="jobColor"
         class="mt-5"
         height="25"
-        stream
+        :indeterminate="percentDone===0 && !job.done"
       >
         <template v-slot:default="{ value }">
-          <strong v-if="!job.done">{{ Math.ceil(value) }}%</strong>
+          <strong v-if="!job.done && percentDone > 0">{{ Math.ceil(value) }}%</strong>
           <strong v-if="job.done && !job.killed">Completed</strong>
           <strong v-if="job.killed">Stopped</strong>
         </template>
@@ -43,7 +43,7 @@ export default {
   methods: {
     async refreshProgress() {
       this.job = await API.getJob();
-      console.log(this.job)
+      this.$store.commit('setErrorMessage', this.logsText)
       if (this.job && this.job.done) {
         this.onFinish();
       } else {
@@ -81,11 +81,11 @@ export default {
     jobColor() {
       if (this.job.killed) {
         return "red lighten-4";
-      }
-      if (this.job.errors) {
+      } else if (this.job.errors) {
         return "orange lighten-4";
+      } else {
+        return "#bbd565";
       }
-      return "green lighten-4";
     },
     percentDone() {
       if (this.job.total == 0) {

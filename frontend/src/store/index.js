@@ -30,7 +30,6 @@ export default new Vuex.Store({
     },
     updateMarkerState(state, { data, error }) {
       state.markerState = data;
-      console.log("Setting error to be", error);
       state.markerState['error'] = error;
       state.markerState['loaded'] = true;
     },
@@ -70,7 +69,6 @@ export default new Vuex.Store({
           'error': false
         });
       } catch (err) {
-        console.log("caught error", err);
         commit('updateMarkerState', {
           'data': {}, 
           'error': true

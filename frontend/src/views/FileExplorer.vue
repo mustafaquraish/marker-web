@@ -48,7 +48,12 @@
 
     <div class="innerc">  
     <FileList :values="values" class="split left" @folderClicked="clickedItem"/>
-    <FavoritesList :values="favorites" @folderClicked="selectedFav" class="split right"/>
+    <FavoritesList 
+      :values="favorites" 
+      @folderClicked="selectedFav" 
+      @removeFav="removeFav" 
+      class="split right"
+    />
     </div>
     
 
@@ -160,6 +165,9 @@ export default {
       } else {
         this.doRequestFav(()=>explorerAPI.addFavorite(this.directory))
       }
+    },
+    removeFav(item) {
+      this.doRequestFav(()=>explorerAPI.delFavorite(item.path))
     },
     selectedFav(item) {
       this.doRequestPath(()=>explorerAPI.getPath(item.path, this.hidden))

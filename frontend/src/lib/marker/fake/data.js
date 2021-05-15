@@ -6,7 +6,8 @@ export const testresult = {
             "exit_code": 1,
             "passed": false,
             "timed_out": false,
-            "mark": 0
+            "mark": 0,
+            "out_of": 1,
         },
         {
             "description": "3 values",
@@ -14,7 +15,8 @@ export const testresult = {
             "exit_code": 1,
             "passed": false,
             "timed_out": false,
-            "mark": 0
+            "mark": 0,
+            "out_of": 1,
         },
         {
             "description": "8 values",
@@ -22,7 +24,8 @@ export const testresult = {
             "exit_code": 0,
             "passed": true,
             "timed_out": false,
-            "mark": 1
+            "mark": 1,
+            "out_of": 1,
         },
         {
             "description": "Closest pair in right subtree",
@@ -30,7 +33,8 @@ export const testresult = {
             "exit_code": 0,
             "passed": true,
             "timed_out": false,
-            "mark": 1
+            "mark": 1,
+            "out_of": 1,
         },
         {
             "description": "Takes too long to run",
@@ -38,7 +42,8 @@ export const testresult = {
             "exit_code": null,
             "passed": false,
             "timed_out": true,
-            "mark": 0
+            "mark": 0,
+            "out_of": 1,
         },
         {
             "description": "Closest pair root and max of left",
@@ -46,7 +51,8 @@ export const testresult = {
             "exit_code": 0,
             "passed": true,
             "timed_out": false,
-            "mark": 1
+            "mark": 1,
+            "out_of": 1,
         },
         {
             "description": "Running another test...",
@@ -54,7 +60,8 @@ export const testresult = {
             "exit_code": null,
             "passed": false,
             "timed_out": true,
-            "mark": 0
+            "mark": 0,
+            "out_of": 2,
         },
         {
             "description": "100 (random) values",
@@ -62,7 +69,8 @@ export const testresult = {
             "exit_code": 1,
             "passed": false,
             "timed_out": false,
-            "mark": 0
+            "mark": 0,
+            "out_of": 2,
         }
     ],
     "marks": [
@@ -73,6 +81,7 @@ export const testresult = {
         1,
         0
     ],
+    "out_of": 10,
     "compile_log": "closest.c:143:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]\n}\n^\nclosest.c:292:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]\n}\n^\nclosest.c:342:1: warning: non-void function does not return a value [-Wreturn-type]\n}\n^\nclosest.c:393:1: warning: non-void function does not return a value [-Wreturn-type]\n}\n^\n4 warnings generated.\n",
     "compiled": true,
     "total": 3,

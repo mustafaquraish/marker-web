@@ -5,12 +5,12 @@
     cols=12 sm=6 lg=4
   >
         <v-sheet align="center" class="py-6 controls">
-          <v-btn color="#34c0f3" @click="prepareClick"> 
+          <v-btn color="#90CAF9" @click="prepareClick"> 
             <v-icon>mdi-qrcode-edit</v-icon>
             <v-spacer/>Prepare Submissions<v-spacer/>
           </v-btn><br>
 
-          <v-btn color="#34c0f3" class="mb-2" @click="runClick(false)" > 
+          <v-btn color="#90CAF9" class="mb-2" @click="runClick(false)" > 
             <v-icon>mdi-code-tags-check</v-icon>
             <v-spacer/>Run tests<v-spacer/>
           </v-btn><br>
@@ -20,7 +20,7 @@
 
             <v-btn color="#bbd565" @click="downloadClick"> 
               <v-icon>mdi-download</v-icon>
-              <v-spacer/>Download files<v-spacer/>
+              <v-spacer/>Download Submissions<v-spacer/>
             </v-btn><br>
 
             <v-btn color="#bbd565" @click="uploadMarksClick"> 
@@ -35,7 +35,7 @@
           
             <div v-if="config.lms == 'markus'">
               <v-btn color="#bbd565" @click="setStatusDialog = true"> 
-                <v-icon>mdi-file-upload</v-icon>
+                <v-icon>mdi-list-status</v-icon>
                 <v-spacer/>Set Status<v-spacer/>
               </v-btn><br>
             </div>
@@ -90,7 +90,7 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">Set status</v-card-title>
       <v-card-text class="mt-4" style="font-size: 12pt">
-          Please select the status:            
+          Please select the status to set            
       </v-card-text>
       <v-divider/>
       <v-card-actions>
@@ -156,7 +156,6 @@ export default {
       await API.stopJob()
     },
     async jobDoneHandler(message, type="") {
-      // console.log(message);
       this.$store.dispatch('showSnackBar', message);
 
       if (type == "download" || type == "run") {

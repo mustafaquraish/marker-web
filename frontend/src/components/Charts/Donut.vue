@@ -27,6 +27,7 @@ export default {
           labels: this.labels,
           datasets: [
             {
+              title: "????",
               backgroundColor: this.colors,
               data: this.values,
             },

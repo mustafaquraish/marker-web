@@ -32,8 +32,7 @@
       <v-card>
         <v-card-title class="headline grey lighten-2">{{errorTitle}}</v-card-title>
         <v-card-text class="my-5 mb-0" style="font-size: 12pt">
-            <pre>{{ errorMessage }}</pre>
-          
+            <pre style="background-color: #f5f5f5">{{ errorMessage }}</pre>
         </v-card-text>
         <v-divider />
         <v-card-actions>

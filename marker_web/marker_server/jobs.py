@@ -1,6 +1,6 @@
 import json
 from flask import make_response
-from marker.utils.token import TokenNotFoundError
+from marker import TokenNotFoundError
 import threading 
 import sys
 
@@ -28,7 +28,7 @@ class JobTracker:
             return False
         JobTracker.name = name
         JobTracker.progress = 0
-        JobTracker.total = 0
+        JobTracker.total = 100
         JobTracker.done = False
         JobTracker.errors = False
         JobTracker.killed = False
@@ -40,7 +40,6 @@ class JobTracker:
     def getInfo():
         if JobTracker.tokenMissing:
             raise TokenNotFoundError("Could not find token")
-
         info = { 
             'name': JobTracker.name,
             'progress': JobTracker.progress,
@@ -51,7 +50,6 @@ class JobTracker:
             'killed': JobTracker.killed,
             'type': JobTracker.jobType
         }
-        # print(json.dumps(info, indent=2))
         return info
     
     @staticmethod
@@ -61,7 +59,6 @@ class JobTracker:
     @staticmethod
     def updateProgress(inc=1):
         JobTracker.progress += inc
-        print("Updating progress:", JobTracker.progress, " //", JobTracker.total, end="\r")
 
     @staticmethod
     def finishJob():
@@ -89,7 +86,6 @@ class JobTracker:
         if JobTracker.errors:
             raise Exception(JobTracker.logs)
 
-        # Reset old values before starting...
         return ret
     
     @staticmethod
@@ -118,15 +114,16 @@ class JobTracker:
     def setStop():
         if (JobTracker.isBusy()):
             JobTracker.shouldExitNow = True
-            print("Setting stop flag")
+
+        # Got request to stop, but no job running.
         else:
-            print("Got request to stop, but no job running.")
+            pass
 
     @staticmethod
     def threadExit():
         JobTracker.addMessage("STOP: The job was stopped")
         JobTracker.killed = True
         JobTracker.total = 0
-        print("Killing thread now.")
         JobTracker.finishJob()
+        # Kill the thread...
         sys.exit()

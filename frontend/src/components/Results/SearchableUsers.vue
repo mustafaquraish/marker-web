@@ -33,13 +33,13 @@
           >
             <v-list-item-avatar>
               <v-avatar color="#90CAF9" dark>
-                {{ item.username.substring(0, 2).toUpperCase() }}
+                {{ iconText(item.username) }}
               </v-avatar>
             </v-list-item-avatar>
 
             <v-list-item-content>
               <v-list-item-title> {{ item.username }} </v-list-item-title>
-              <v-list-item-subtitle v-if="item.marks">{{ sum(item.marks) }} marks</v-list-item-subtitle>
+              <v-list-item-subtitle v-if="item.marks">{{ sum(item.marks) }} / {{totalMarks}} marks</v-list-item-subtitle>
               <v-list-item-subtitle v-if="!item.marks"> Unmarked</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -53,10 +53,7 @@
 
 <script>
 import SearchBar from "@/components/SearchBar";
-import { sum } from '@/utils'
-
-import { Splitpanes, Pane } from "splitpanes";
-import "splitpanes/dist/splitpanes.css";
+import { sum, iconText } from '@/lib/utils'
 
 export default {
   name: "Home",
@@ -67,8 +64,6 @@ export default {
 
   components: {
     SearchBar,
-    Splitpanes,
-    Pane,
   },
 
   data: () => ({
@@ -80,6 +75,13 @@ export default {
       this.clickedItem(this.items[this.selectedIndex].username)
     }
   },
+  computed: {
+    totalMarks() {
+      return this.$store.state.markerState.config.tests.reduce((res, item) => {
+        return res + item.mark;
+      }, 0)
+    }
+  },
   methods: {
     onSearchChange(username) {
       this.searchTerm = username;
@@ -87,7 +89,15 @@ export default {
     clickedItem(username) {
       this.$emit('userClicked', username)
     },
+    iconText(username) {
+      if (username.includes(".")) {
+        let parts = username.split(".");
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return username.substring(0, 2).toUpperCase()
+    },
     sum,
+    iconText,
     hidden(item) {
       let itemName = item.username.toLowerCase();
       if (!this.searchTerm.startsWith(':') &&

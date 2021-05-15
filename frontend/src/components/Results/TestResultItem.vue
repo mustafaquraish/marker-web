@@ -7,29 +7,29 @@
 
           <v-list-item-content class="py-2">
               <v-list-item-title> {{ test.description }} </v-list-item-title>
-              <v-list-item-subtitle>
-              {{ test.mark }} marks</v-list-item-subtitle
-              >
+              <v-list-item-subtitle> {{ test.mark }} / {{test.out_of}} marks</v-list-item-subtitle>
+              
+
           </v-list-item-content>
       </template>
 
-      <v-list-item
-        disabled
+      <div
+        class="pa-3"
+        style="color: black; background-color: #f5f5f5"
       >
-        <v-list-item-content>
+        <div>
           <div class="body-1">
-            <p>
-              Exit Code: {{test.exit_code}}
+            <li>Exit Code: {{test.exit_code}}
               <span v-if="test.exit_code == null">None (test timed out)</span>
-            </p>
+            </li>
             <div v-if="test.output != ''">
-              Output:
+              <li>Output: </li>
               <pre>{{test.output}}</pre>
             </div>
           </div>
           
-        </v-list-item-content>
-      </v-list-item>
+        </div>
+      </div>
   </v-list-group>
 </template>
 

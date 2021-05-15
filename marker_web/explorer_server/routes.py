@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, make_response
 from flask_cors import CORS
 from .favorites import FavoritesManager
 
@@ -39,13 +39,6 @@ def getDirData(curPath, hidden=False):
 def route_get_subfolder():
     path = request.args.get('path', HOMEDIR)
     hidden = request.args.get('hidden', 'false') == 'true'
-    print()
-    print()
-    print()
-    print("GOT PATH:", path)
-    print()
-    print()
-    print()
     curPath = os.path.abspath(path)
     return getDirData(curPath, hidden)
 
@@ -76,3 +69,10 @@ def route_del_favorite():
     if path is not None:
         FAVORITES.removeFavorite(path)
     return jsonify(FAVORITES.getFavorites())
+
+@explorerBP.errorhandler(Exception)
+def route_exception_handler(exc):
+    message = str(exc) + "\n- It's possible one of the favorites you selected has moved."
+    return make_response({
+        'message': message
+    }, 400);

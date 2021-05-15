@@ -41,12 +41,12 @@
             <template v-slot:default="{ active }">
               <v-list-item-avatar>
                 <v-avatar color="#90CAF9" dark>
-                  {{ item.username.substring(0, 2).toUpperCase() }}
+                  {{ iconText(item.username) }}
                 </v-avatar>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>{{ item.username }}</v-list-item-title>
-                <v-list-item-subtitle v-if="item.marks">{{ sum(item.marks) }} marks</v-list-item-subtitle>
+                <v-list-item-subtitle v-if="item.marks">{{ sum(item.marks) }} / {{ totalMarks }} marks</v-list-item-subtitle>
                 <v-list-item-subtitle v-if="!item.marks"> Unmarked</v-list-item-subtitle>
               </v-list-item-content>
               <v-spacer/>
@@ -62,7 +62,7 @@
                     v-bind="attrs"
                     @click.stop="goToResult(item.username)"
                   >
-                      <v-icon color="blue">mdi-arrow-top-right-thin-circle-outline</v-icon>
+                      <v-icon color="#90CAF9">mdi-arrow-top-right-thin-circle-outline</v-icon>
                   </v-list-item-icon>
                 </template>
                 <span>Open Results</span>
@@ -79,10 +79,7 @@
 
 <script>
 import SearchBar from "@/components/SearchBar";
-import { sum } from "@/utils";
-
-import { Splitpanes, Pane } from "splitpanes";
-import "splitpanes/dist/splitpanes.css";
+import { sum, iconText } from "@/lib/utils";
 
 export default {
   name: "Home",
@@ -93,8 +90,6 @@ export default {
 
   components: {
     SearchBar,
-    Splitpanes,
-    Pane,
   },
 
   data: () => ({
@@ -107,6 +102,7 @@ export default {
       this.searchTerm = username;
     },
     sum,
+    iconText,
     hidden(item) {
       let itemName = item.username.toLowerCase();
       if (
@@ -146,11 +142,13 @@ export default {
     },
     goToResult(username) {
       this.$router.push('/results/'+username);
-    }
+    },
   },
   computed: {
-    mobile() {
-      return this.$store.state.isMobile;
+    totalMarks() {
+      return this.$store.state.markerState.config.tests.reduce((res, item) => {
+        return res + item.mark;
+      }, 0)
     }
   },
 };
