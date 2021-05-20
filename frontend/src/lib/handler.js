@@ -34,6 +34,8 @@ export async function handleReponse(func, fakefunc) {
             store.commit('setTokenDialog', true)
         } else if (message == "busy") {
             store.dispatch('showSnackBar', "Another job is currently running.")
+        } else if (message == "no_auth") { 
+            store.commit('setNeedAuth', true)
         } else {
             store.dispatch('showErrorDialog', {
                 message: err.response.data.message

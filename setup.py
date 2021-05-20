@@ -4,10 +4,10 @@ import setuptools
 
 setuptools.setup(
     name='marker-web',
-    version='1.0.0',
+    version='1.1.0',
     entry_points={
     'console_scripts': [
-            'marker-web = marker_web.server:main',
+            'marker-web = marker_web.__main__:main',
         ],
     },
     author="Mustafa Quraish",

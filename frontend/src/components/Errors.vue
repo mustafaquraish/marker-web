@@ -3,7 +3,7 @@
     <v-dialog v-model="tokenDialog" width="80%">
       <v-card>
         <v-card-title class="headline grey lighten-2"
-          >Missing token</v-card-title
+          >Missing LMS Access Token</v-card-title
         >
         <v-card-text class="mt-2" style="font-size: 12pt">
           Enter the access token below for <code>{{ baseURL }}</code

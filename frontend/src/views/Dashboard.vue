@@ -95,9 +95,9 @@
       <v-divider/>
       <v-card-actions>
         <v-spacer/>
-        <v-btn color="primary" width="200" text @click="statusClick('complete')">Complete</v-btn>
+        <v-btn color="primary" width="40%" text @click="statusClick('complete')">Complete</v-btn>
         <v-spacer/>
-        <v-btn color="primary" width="200" text @click="statusClick('incomplete')">Incomplete</v-btn>
+        <v-btn color="primary" width="40%" text @click="statusClick('incomplete')">Incomplete</v-btn>
         <v-spacer/>
       </v-card-actions>
     </v-card>
