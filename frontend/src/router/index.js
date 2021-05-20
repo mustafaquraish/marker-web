@@ -5,6 +5,7 @@ import Stats from '../views/Stats.vue'
 import Settings from '../views/Settings.vue'
 import Dashboard from '../views/Dashboard.vue'
 import FileExplorer from '../views/FileExplorer.vue'
+import Auth from '../views/Auth.vue'
 
 import UserResult from '@/components/Results/UserResult'
 
@@ -65,7 +66,19 @@ import store from '@/store/index.js'
 import markerAPI from '@/lib/marker/API'
 
 router.beforeEach(async (to, from, next) => {
+  if (to.query.auth) {
+    $cookies.set("auth", to.query.auth)
+    store.commit('setNeedAuth', false);
+    store.commit('setMarkerStateLoaded', false)
+    router.replace({'query': null});
+  }
+  next()
+})
+
+router.beforeEach(async (to, from, next) => {
   if (to.path == "/explorer") next()
+
+  console.log("loaded??:", store.state.markerState.loaded);
 
   if (!store.state.markerState.loaded) {
     await store.dispatch('fetchMarkerState',
@@ -73,7 +86,12 @@ router.beforeEach(async (to, from, next) => {
     );
   } 
   
-  if (!store.state.markerState.valid) next('/explorer')
+  console.log("needAuth:", store.state.needAuth);
+  console.log("valid:", store.state.markerState.valid);
+  console.log("store", store.state)
+
+  if (store.state.needAuth) next()
+  else if (!store.state.markerState.valid) next('/explorer')
   else next();
 })
 

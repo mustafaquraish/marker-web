@@ -15,6 +15,9 @@ export default new Vuex.Store({
       config: undefined,
       error: false,
     },
+
+    needAuth: false,
+
     tokenDialog: false,
 
     errorDialog: false,
@@ -24,9 +27,16 @@ export default new Vuex.Store({
     snackBar: false,
     snackMessage: "Unknown Error",
   },
+
   mutations: {
     updateMobile(state) {
       state.isMobile = innerWidth <= 700;
+    },
+    setNeedAuth(state, bool) {
+      state.needAuth = bool;
+    },
+    setMarkerStateLoaded(state, bool) {
+      state.markerState['loaded'] = bool;
     },
     updateMarkerState(state, { data, error }) {
       state.markerState = data;
@@ -62,12 +72,14 @@ export default new Vuex.Store({
       commit('setErrorDialog', true)
     },
     async fetchMarkerState({ commit }, func) {
+      console.log("fetching.....")
       try {
         let data = await func();
+        console.log("Git...", data)
         commit('updateMarkerState', {
-          data, 
-          'error': false
-        });
+            data, 
+            'error': false
+          });
       } catch (err) {
         commit('updateMarkerState', {
           'data': {}, 

@@ -7,6 +7,7 @@
       v-model="searchTerm"
       append-icon="mdi-magnify"
       autocomplete="off"
+      clearable
       @keydown.esc="searchTerm = ''"
     >
     </v-text-field>

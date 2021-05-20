@@ -1,12 +1,16 @@
 <template>
 <div>
-  <v-app v-if="!markerState.loaded">
+  <v-app v-if="status == 'auth'">
+    <Auth></Auth>
+    <Errors></Errors>
+  </v-app>
+  <v-app v-if="status == 'loading'">
     <div class="waiting-app">
       <v-progress-circular indeterminate class="ma-5" color="green"/>
       Connecting to the server...
     </div>
   </v-app>
-  <v-app v-if="markerState.error">
+  <v-app v-if="status == 'error'">
     <div class="waiting-app">
       There appears to be some issues connecting to the server. Please have a look at the output logs and get in touch if you are not able to resolve the issue.
     </div>
@@ -14,7 +18,7 @@
   <v-app 
     id="inspire"
     style="overflow: hidden"
-    v-if="markerState.loaded && !markerState.error"
+    v-if="status == 'ok'"
   >
     <v-navigation-drawer
       v-model="drawer"
@@ -88,12 +92,14 @@
 
 <script>
 import FileExplorer from '@/views/FileExplorer.vue'
+import Auth from '@/views/Auth.vue'
 import Errors from '@/components/Errors.vue'
 
 export default {
   components: {
     FileExplorer,
     Errors,
+    Auth
   },
   data: () => ({ 
     drawer: null,
@@ -111,6 +117,21 @@ export default {
   computed: {
     markerState() {
       return this.$store.state.markerState;
+    },
+    needAuth() {
+      return this.$store.state.needAuth;
+    },
+    status() {
+      if (this.needAuth) {
+        return "auth";
+      }
+      if (!this.markerState.loaded) {
+        return "loading"
+      }
+      if (this.markerState.loaded && this.markerState.error) {
+        return "error"
+      }
+      return "ok"
     }
   },
   created(){

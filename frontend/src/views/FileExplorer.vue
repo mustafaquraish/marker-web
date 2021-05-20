@@ -38,8 +38,6 @@
           <span v-if="isFavorite">Remove Favorite</span>
           <span v-if="!isFavorite">Add Favorite</span>
         </v-tooltip>
-      
-
         
         <v-spacer></v-spacer>
 
