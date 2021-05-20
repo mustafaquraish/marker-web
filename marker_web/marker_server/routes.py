@@ -1,20 +1,13 @@
-from flask import Flask, make_response, request, jsonify, Blueprint
-from flask_cors import CORS
+import os
+import time
+from pathlib import Path
 
+from flask import make_response, request, jsonify, Blueprint
 from marker import Marker, TokenNotFoundError
-from marker.utils import config
-from marker.utils import pushd
-from marker.utils.marksheet import Marksheet
 
 from .console import WebConsole
 from .jobs import JobTracker
-import argparse
-import json
-import threading
-import os
-import time
-
-from pathlib import Path
+from .utils import getArgsDefaults
 
 ############################# Init Flask ######################################
 
@@ -42,8 +35,8 @@ def route_set_path():
     path = request.args.get('path', None)
     if path is None:
         return make_response("Path not included", 400)
-    args = parseArgs(assgn_dir=path)
-    if updateMarker(args):
+    args = getArgsDefaults(assgn_dir=path)
+    if setupMarker(args):
         return make_response("Success", 200)
     else:
         return make_response("Path isn't valid", 400)
@@ -281,6 +274,8 @@ def route_set_status_single(student_id):
 ###############################################################################
 ###############################################################################
 
+import traceback
+
 @markerBP.errorhandler(TokenNotFoundError)
 def route_token_not_found(exc):
     return make_response({
@@ -291,13 +286,13 @@ def route_token_not_found(exc):
 @markerBP.errorhandler(Exception)
 def route_other_error(exc):
     return make_response({
-        "message": str(exc),
+        "message": traceback.format_exc(),
     }, 400)
 
 
 @markerBP.route('/<path:u_path>')
 def route_catch_all(u_path):
-    message = { 'message': 'Roses are red, violets are blue. This page is empty, I can\'t help you :(' }
+    message = { 'message': 'Request made to an invalid endpoint: ' + u_path }
     return make_response(message, 404)
 
 
@@ -305,9 +300,24 @@ def route_catch_all(u_path):
 ###############################################################################
 ###############################################################################
 
-from .utils import parseArgs
+def setupMarker(args):
+    """
+    Attempts to set up the marker with the specified arguments. If the marker
+    is set up successfully, `True` is returned, otherwise `False`.
 
-def updateMarker(args):
+    A `False` return value means that the configuration file specified was
+    not found or able to be loaded properly.
+
+    `args` must be as follows:
+    ```
+    args = {
+        'assgn_dir': '...',
+           'config': '...',
+          'src_dir': '...'
+    }
+    ```
+    """
+
     global ARGS
     global MARKER
 
@@ -318,7 +328,3 @@ def updateMarker(args):
     except BaseException as exc:
         MARKER = None
         return False
-
-def setupMarker():
-    args = parseArgs()
-    updateMarker(args)

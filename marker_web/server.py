@@ -33,27 +33,6 @@ app.register_blueprint(markerBP, url_prefix='/api/marker')
 
 ### Default route:
 index_html_path = os.path.join(resourcesPath, "index.html")
-print(resourcesPath)
 @app.route("/")
 def route_default():
     return send_file(index_html_path)
-
-PORT = 6275
-
-def main():
-    # Try to run setup the marker in the current directory, but this
-    # might fail if command line args are not specified. Don't do
-    # anything here, user will be prompted to pick dir in UI.
-    setupMarker()
-
-    token = generate_auth_token(32)
-    print("-"*80)
-    print("Generated token: ", token)
-    print("-"*80)
-    print(f"Running at: http://localhost:{PORT}/#/?auth={token}")
-    print("-"*80)
-
-    app.run(debug=False, port=PORT)
-
-if __name__ == '__main__':
-    main()

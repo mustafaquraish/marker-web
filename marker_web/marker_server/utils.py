@@ -1,17 +1,9 @@
 import os
 import argparse
+from collections import defaultdict
 
-def parseArgs(**kwargs):
-    top_parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    top_parser.add_argument("-d","--assgn_dir", default=os.getcwd(), help="Marking directory (Default: current)")
-    top_parser.add_argument("-c","--config", default=None, help="Location of config file (Default: assgn_dir/config.yml)")
-    top_parser.add_argument("-s","--src_dir", default=None, help="Location of source files (Default: assgn_dir)")
-
-    args, unknown = top_parser.parse_known_args()
-    args = vars(args)
-
+def getArgsDefaults(**kwargs):
+    args = defaultdict(lambda: None)
 
     for key, value in kwargs.items():
         args[key] = value

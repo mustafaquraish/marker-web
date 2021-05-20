@@ -12,7 +12,6 @@ class WebConsole(ConsoleABC):
         JobTracker.errors = True
 
     def log(self, *args, **kwargs):
-        print('[+]', *args)
         JobTracker.addMessage('LOG: ' + " ".join(map(str,args)))
     
     # No input from webserver

@@ -65,7 +65,7 @@ class JobTracker:
         JobTracker.done = True
         JobTracker.progress = JobTracker.total
         JobTracker.shouldExitNow = False
-        print("Job finished")
+        print(f"[+] Job `{JobTracker.name}` finished")
 
     @staticmethod
     def addMessage(msg):
