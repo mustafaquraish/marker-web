@@ -72,10 +72,8 @@ export default new Vuex.Store({
       commit('setErrorDialog', true)
     },
     async fetchMarkerState({ commit }, func) {
-      console.log("fetching.....")
       try {
         let data = await func();
-        console.log("Git...", data)
         commit('updateMarkerState', {
             data, 
             'error': false

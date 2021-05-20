@@ -104,7 +104,6 @@ export default {
   },
   beforeMount() {
     API.getStats().then((res) => {
-        console.log(res)
       this.stats = res;
     });
     API.getAllResults().then((res) => {

@@ -34,7 +34,6 @@ export default {
     ////////////////////////////////////////////////////////////////////////////////////
 
     async getAllResults() {
-        // console.log("Asking for all results...")
         return handleReponse(
             () => axios.get(HOST + "/results"),  /* Real request */
             () => FakeAPI.getAllResults(),       /* Fake request */

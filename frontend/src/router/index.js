@@ -78,17 +78,11 @@ router.beforeEach(async (to, from, next) => {
 router.beforeEach(async (to, from, next) => {
   if (to.path == "/explorer") next()
 
-  console.log("loaded??:", store.state.markerState.loaded);
-
   if (!store.state.markerState.loaded) {
     await store.dispatch('fetchMarkerState',
       () => markerAPI.getMarkerState()
     );
   } 
-  
-  console.log("needAuth:", store.state.needAuth);
-  console.log("valid:", store.state.markerState.valid);
-  console.log("store", store.state)
 
   if (store.state.needAuth) next()
   else if (!store.state.markerState.valid) next('/explorer')
