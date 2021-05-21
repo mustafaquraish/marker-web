@@ -15,7 +15,7 @@ def generate_auth_token(size=32):
 def require_token(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        rec_token = request.args.get('auth', None)
+        rec_token = request.cookies.get('auth', None)
         if TOKEN is not None and rec_token != TOKEN:
             return make_response({
                 "message": "no_auth",

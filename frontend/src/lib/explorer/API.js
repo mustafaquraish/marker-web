@@ -1,4 +1,4 @@
-import axios from '@/lib/axiosConfig';
+import axios from 'axios';
 import FakeAPI from '@/lib/explorer/fake/FakeAPI'
 import { handleReponse } from '@/lib/handler'
 
