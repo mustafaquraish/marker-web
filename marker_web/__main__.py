@@ -32,7 +32,8 @@ def main():
 
     # Run on remote machine
     if args["remote"] is not None:
-        cmd = f"ssh -t -t -L {PORT}:localhost:{PORT} {args['remote']} marker-web -p {PORT} -a"
+        host = args['remote']
+        cmd = f"ssh -t -t -L {PORT}:localhost:{PORT} {host} MARKER_HOST={host} marker-web -p {PORT} -a"
         if verbose:
             cmd += " -v"
 
@@ -49,7 +50,7 @@ def main():
 
     if args["auth"]:
         token = generate_auth_token(32)
-        print(""*80)
+        print("-"*80)
         print("Generated token: ", token)
         print("-"*80)
         print(f"Running at: http://localhost:{PORT}/#/?auth={token}")

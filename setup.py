@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
     name='marker-web',
-    version='1.1.0',
+    version='1.1.1',
     entry_points={
     'console_scripts': [
             'marker-web = marker_web.__main__:main',
