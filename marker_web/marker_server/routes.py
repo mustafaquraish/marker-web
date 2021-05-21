@@ -17,6 +17,7 @@ markerBP = Blueprint('marker', __name__)
 
 MARKER = None
 ARGS = {}
+HOSTNAME = os.environ.get('MARKER_HOST', None)
 
 ###############################################################################
 
@@ -107,18 +108,18 @@ def route_single_result(student_id):
         }
         return student_result
 
+    student_result = { 
+        "path": os.path.abspath(student_dir),
+        "host": HOSTNAME,
+    }
+    
     json_path = f'{student_dir}/{MARKER.cfg["results"]}'
     if not os.path.isfile(json_path):
-        student_result = { 
-            "marked": False, 
-            "message": "Submission is not marked yet.",
-            "path": os.path.abspath(student_dir),
-        }
+        student_result["marked"] = False
+        student_result["message"] = "Submission is not marked yet.",
         return student_result
         
-    student_result = {}
     # Add the directory onto the result so we can open up vscode :^)
-    student_result["path"] = os.path.abspath(student_dir)
     student_result["marked"] = True
     student_result["data"] = open(json_path).read()
     return student_result

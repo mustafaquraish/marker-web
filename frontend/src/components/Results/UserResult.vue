@@ -67,7 +67,7 @@
             class="ma-2"
             target="_blank"
             :disabled="!result || !result.path"
-            :href="'vscode://file/'+dirPath"
+            :href="vscodeUrl"
           > 
             Open in VSCode 
           </v-btn>
@@ -183,6 +183,18 @@
       dirPath() {
         if (!this.result || !this.result.path) return "";
         return this.result.path
+      },
+      vscodeUrl() {
+        if (!this.result || !this.result.path) return "";
+        let prefix = 'vscode://';
+        if (this.result.host) {
+          prefix = prefix + 'vscode-remote/ssh-remote+' + this.result.host;
+        } else {
+          prefix = prefix + 'file'
+        }
+        const url = prefix + this.result.path;
+        // console.log("VSCode URL is:", url);
+        return url;
       }
     },
     methods: {
@@ -199,6 +211,7 @@
         this.result.path = res.path;
         this.result.marked = res.marked;
         this.result.message = res.message;
+        this.result.host = res.host;
         this.loading = false;
       },
       refreshResults() {

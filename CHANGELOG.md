@@ -1,3 +1,7 @@
+## Version 1.1.1
+
+- `Open in VSCode` button now opens remote directories correctly.
+
 ## Version 1.1.0
 
 - Added support for authentication. Can now run with:
