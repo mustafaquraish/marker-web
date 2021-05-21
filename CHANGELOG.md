@@ -1,3 +1,8 @@
+## Version 1.1.2
+
+- Auth token now sent through cookies directly, no need to intercept requests.
+- Made some UI adjustments to be mobile friendlier
+
 ## Version 1.1.1
 
 - `Open in VSCode` button now opens remote directories correctly.
