@@ -2,18 +2,34 @@
   <div class="root ma-0 pa-0 mr-0">
     
     <div class="subcontainer">
-      <v-subheader class="title mb-2">
-        Select assignment directory
+      <v-subheader class="title ma-2">
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon v-bind="attrs" v-on="on" class="mx-5">mdi-information-outline </v-icon>
+            <v-icon  v-bind="attrs" v-on="on" class="mr-2">
+              mdi-information-outline 
+            </v-icon>
           </template>
           <span>Should contain a valid config file</span>
         </v-tooltip>
+        <span>
+          Select assignment directory
+        </span>
       </v-subheader>
-      <div style="display: flex; flex-direction: row;">
-        <span class="px-4">Current directory:</span><code>{{shortDirName}}</code>
-      </div>
+      
+      <v-row class="pa-5 px-10">
+        <div
+         class="pa-0 ma-0 mr-2"
+        >Current directory:</div>
+        <div class="pa-0"><code>{{shortDirName}}</code></div>
+      </v-row>
+
+      <FavoritesList 
+        v-if="mobile && favorites.length > 0"
+        :values="favorites" 
+        @folderClicked="selectedFav" 
+        @removeFav="removeFav" 
+        style="max-height: 150px"
+      />
 
       <div class="dirControls my-2 mx-3">
         <v-tooltip bottom>
@@ -45,12 +61,18 @@
       </div>
 
     <div class="innerc">  
-    <FileList :values="values" class="split left" @folderClicked="clickedItem"/>
+    <FileList :values="values" 
+      class="split"
+      style="width: 100%"
+      @folderClicked="clickedItem"
+    />
     <FavoritesList 
       :values="favorites" 
       @folderClicked="selectedFav" 
       @removeFav="removeFav" 
-      class="split right"
+      v-if="!mobile && favorites.length > 0"
+      class="split"
+      style="width: 60%"
     />
     </div>
     
@@ -116,6 +138,9 @@ export default {
     this.doRequestFav(()=>explorerAPI.getFavorites())
   },
   computed: {
+    mobile() {
+      return this.$store.state.isMobile;
+    },
     shortDirName () {
       let maxnamelength = 60;
       if (this.directory.length > maxnamelength) {
@@ -224,19 +249,6 @@ export default {
   .split {
     margin: 0px 5px;
   }
-}
-
-.title {
-  font-size: 10;
-}
-
-.left {
-  // background-color: red;
-  width: 60%;
-}
-
-.right {
-  width: 40%
 }
 
 .dirControls {
