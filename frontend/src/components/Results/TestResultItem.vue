@@ -19,9 +19,8 @@
       >
         <div>
           <div class="body-1">
-            <li>Exit Code: {{test.exit_code}}
-              <span v-if="test.exit_code == null">None (test timed out)</span>
-            </li>
+            <li>Exit Code: {{test.exit_code}} <span v-if="test.exit_code == null">None (test timed out)</span></li>
+            <li>Time taken: {{Math.round(test.time * 100) / 100}}s</li>
             <div v-if="test.output != ''">
               <li>Output: </li>
               <pre>{{test.output}}</pre>
