@@ -71,6 +71,17 @@
           > 
             Open in VSCode 
           </v-btn>
+
+          <v-btn 
+            color="#ca85d6" 
+            width="200"
+            class="ma-2"
+            target="_blank"
+            v-if="result && result.lms_url"
+            :href="result.lms_url"
+          > 
+            Open on LMS 
+          </v-btn>
       </v-row>
       
     </div>
@@ -212,6 +223,7 @@
         this.result.marked = res.marked;
         this.result.message = res.message;
         this.result.host = res.host;
+        this.result.lms_url = res.lms_url;
         this.loading = false;
       },
       refreshResults() {

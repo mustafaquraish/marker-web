@@ -101,16 +101,19 @@ def route_results():
 @markerBP.route('/results/<string:student_id>', methods=['GET', 'POST'])
 def route_single_result(student_id): 
     student_dir = MARKER.getStudentDir(student_id)
+    lms_url = MARKER.getLMSSubmissionURL(student_id)
     if student_dir is None:
         student_result = { 
             "marked": False, 
             "message": "Student directory doesn't exist. You may need to delete the marksheet and re-download submissions." ,
+            "lms_url": lms_url
         }
         return student_result
 
     student_result = { 
         "path": os.path.abspath(student_dir),
         "host": HOSTNAME,
+        "lms_url": lms_url
     }
     
     json_path = f'{student_dir}/{MARKER.cfg["results"]}'
@@ -301,6 +304,16 @@ def route_catch_all(u_path):
 ###############################################################################
 ###############################################################################
 
+import threading
+
+def attemptFetchStudents():
+    try:
+        # Attempt to try and get students. Ignore any errors here
+        # since it's perfectly fine if an LMS is not specified.
+        _ = MARKER.lms.mapping
+    except:
+        pass
+
 def setupMarker(args):
     """
     Attempts to set up the marker with the specified arguments. If the marker
@@ -325,7 +338,11 @@ def setupMarker(args):
     try:
         ARGS = args
         MARKER = Marker(args, WebConsole())
-        return True
     except BaseException as exc:
         MARKER = None
         return False
+
+    # Fetch in the background, not critical.
+    threading.Thread(target=attemptFetchStudents).start()    
+
+    return True
