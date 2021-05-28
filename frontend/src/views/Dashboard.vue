@@ -39,6 +39,13 @@
                 <v-spacer/>Set Status<v-spacer/>
               </v-btn><br>
             </div>
+
+            <div v-if="config.lms == 'canvas'">
+              <v-btn color="#bbd565" @click="deleteReportsClick"> 
+                <v-icon>mdi-delete-outline</v-icon>
+                <v-spacer/>Delete Reports<v-spacer/>
+              </v-btn><br>
+            </div>
           </div>
 
           <v-divider class="my-2"/>
@@ -147,6 +154,9 @@ export default {
     },
     uploadReportsClick(recompile) {
       this.runJob(()=>API.uploadReportsAll(this.selectedUsers()));
+    },
+    deleteReportsClick(recompile) {
+      this.runJob(()=>API.deleteReportsAll(this.selectedUsers()));
     },
     statusClick(status) {
       this.setStatusDialog = false;
