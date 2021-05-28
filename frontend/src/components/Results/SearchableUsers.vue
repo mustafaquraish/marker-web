@@ -25,7 +25,7 @@
         <div 
           v-for="(item, i) in items" 
           :key="i"
-          :hidden="hidden(item)"
+          :hidden="isHidden(item, searchTerm)"
         >
           <v-list-item 
             class="ma-0 py-1 px-5"
@@ -54,6 +54,7 @@
 <script>
 import SearchBar from "@/components/SearchBar";
 import { sum, iconText } from '@/lib/utils'
+import { isHidden } from '@/lib/search'
 
 export default {
   name: "Home",
@@ -86,32 +87,12 @@ export default {
     onSearchChange(username) {
       this.searchTerm = username;
     },
+    isHidden,
     clickedItem(username) {
       this.$emit('userClicked', username)
     },
-    iconText(username) {
-      if (username.includes(".")) {
-        let parts = username.split(".");
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-      }
-      return username.substring(0, 2).toUpperCase()
-    },
-    sum,
     iconText,
-    hidden(item) {
-      let itemName = item.username.toLowerCase();
-      if (!this.searchTerm.startsWith(':') &&
-          !this.searchTerm.startsWith('.'))
-        return !itemName.includes(this.searchTerm.toLowerCase())
-
-      let meta = "";
-      if (!item.marks)  meta += "unmarked"
-      else {
-        if (item.marks.length === 0) { meta += "failed" }
-        if (sum(item.marks) == 0)    { meta +=  "zero"  }
-      }
-      return !meta.includes(this.searchTerm.slice(1).toLowerCase()) 
-    }
+    sum
   },
 };
 </script>

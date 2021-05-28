@@ -36,7 +36,7 @@
         multiple
         class="ma-1"
       >
-        <div v-for="(item, i) in items" :key="i" :hidden="hidden(item)">
+        <div v-for="(item, i) in items" :key="i" :hidden="isHidden(item, searchTerm)">
           <v-list-item class="px-4 my-0 listitem" :value="i">
             <template v-slot:default="{ active }">
               <v-list-item-avatar>
@@ -80,6 +80,7 @@
 <script>
 import SearchBar from "@/components/SearchBar";
 import { sum, iconText } from "@/lib/utils";
+import { isHidden } from '@/lib/search'
 
 export default {
   name: "Home",
@@ -103,23 +104,7 @@ export default {
     },
     sum,
     iconText,
-    hidden(item) {
-      let itemName = item.username.toLowerCase();
-      if (
-        !this.searchTerm.startsWith(":") &&
-        !this.searchTerm.startsWith(".")
-      ) {
-        return !itemName.includes(this.searchTerm.toLowerCase());
-      }
-
-      let meta = "";
-      if (!item.marks)  meta += "unmarked"
-      else {
-        if (item.marks.length === 0) { meta += "failed" }
-        if (sum(item.marks) == 0)    { meta +=  "zero"  }
-      }
-      return !meta.includes(this.searchTerm.slice(1).toLowerCase());
-    },
+    isHidden,
     getSelectedUsernames() {
       let lst = this.settings.reduce((result, index) => {
         let username = this.items[index].username;
@@ -134,7 +119,9 @@ export default {
       if (bool) {
         this.settings = [];
         for (let i = 0; i < this.items.length; i++) {
-          this.settings.push(i);
+          if (!isHidden(this.items[i], this.searchTerm)) {
+            this.settings.push(i);
+          }
         }
       } else {
         this.settings = [];
