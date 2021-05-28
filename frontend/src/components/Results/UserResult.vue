@@ -8,7 +8,7 @@
       v-if="username"
     >
       <v-icon
-        v-if="mobile"
+        v-if="$route.params.username"
         @click="$router.go(-1)"
       >
         mdi-arrow-left
@@ -26,7 +26,7 @@
       <v-row 
         class="ma-5"
         align="center"
-        justify="space-around"
+        justify="center"
       >   
           <v-btn 
             color="#90CAF9" 
@@ -66,6 +66,7 @@
             width="200"
             class="ma-2"
             target="_blank"
+            v-if="showVSCode"
             :disabled="!result || !result.path"
             :href="vscodeUrl"
           > 
@@ -188,8 +189,12 @@
       }
     },
     computed: {
-      mobile() {
-        return this.$store.state.isMobile;
+      showVSCode() {
+        // Don't show for mobile devices:
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+          return false;
+        }
+        return true;
       },
       dirPath() {
         if (!this.result || !this.result.path) return "";
